@@ -23,6 +23,7 @@
    14. 호스트 시작 화면 (첫 메일, 터미널), 잠금 화면
    15. 엔딩
    16. 연결 보드, 3단계 보고서, 반전 화면
+   17. 직접 수사하기: 글 속 단어, 📌 핀, 연결고리, 단어 카드
    ========================================================= */
 
 
@@ -3238,34 +3239,6 @@ code {
   color: #efe3cf;
 }
 
-.blank {
-  appearance: none;
-  -webkit-appearance: none;
-  height: 30px;
-  margin: 0 3px;
-  padding: 0 26px 0 10px;
-  border-radius: 7px;
-  border: 1px dashed rgba(242, 180, 90, 0.55);
-  background:
-    linear-gradient(45deg, transparent 50%, #c9a565 50%) right 12px center / 5px 5px no-repeat,
-    linear-gradient(-45deg, transparent 50%, #c9a565 50%) right 7px center / 5px 5px no-repeat,
-    rgba(242, 180, 90, 0.06);
-  color: #a8987a;
-  font: 500 13px var(--sans);
-  cursor: pointer;
-  vertical-align: middle;
-}
-
-.blank.set {
-  border-style: solid;
-  border-color: rgba(242, 180, 90, 0.8);
-  background-color: rgba(242, 180, 90, 0.16);
-  color: #ffe3b8;
-  font-weight: 700;
-}
-
-.blank option { background: #1c1710; color: #efe3cf; }
-
 .fill {
   display: inline-block;
   margin: 0 3px;
@@ -3423,4 +3396,299 @@ code {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+
+/* ---------------------------------------------------------
+   17. 직접 수사하기: 글 속 단어, 📌 핀, 연결고리, 단어 카드
+   --------------------------------------------------------- */
+
+/* 글 속 단어: 평소엔 티 나지 않다가, 마우스를 올리면 밑줄 */
+.kw {
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 0.12s;
+}
+
+.kw:hover {
+  background: rgba(242, 180, 90, 0.22);
+  text-decoration: underline dotted #e8930c 1.5px;
+  text-underline-offset: 3px;
+}
+
+/* 이미 모은 단어: 얇은 밑줄 */
+.kw.got {
+  text-decoration: underline solid rgba(232, 147, 12, 0.55) 1px;
+  text-underline-offset: 3px;
+}
+
+.wpop {
+  position: absolute;
+  z-index: 120;
+  padding: 3px 9px;
+  border-radius: 6px;
+  background: #f5b800;
+  color: #2a1d00;
+  font: 600 12px var(--sans);
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  animation: wpop 1.1s ease-out forwards;
+}
+
+.wpop.old { background: #e5e5ea; color: #555; }
+
+@keyframes wpop {
+  0% { opacity: 0; transform: translate(-50%, -60%); }
+  15% { opacity: 1; transform: translate(-50%, -100%); }
+  70% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -180%); }
+}
+
+/* 메시지 옆 📌 (마우스를 올리면 보임) */
+.pin-btn {
+  align-self: center;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #8b96a1;
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.12s, background 0.12s;
+}
+
+.m:hover .pin-btn,
+.pin-btn:focus-visible { opacity: 1; }
+.pin-btn:hover { background: rgba(0, 0, 0, 0.08); color: #d63b3b; }
+.pin-btn.on { opacity: 1; color: #d63b3b; }
+
+/* 메일, 이벤트 뷰어의 핀 단추 */
+.mail-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.mail-top h2 { flex: 1; }
+
+.pin-wide {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 4px;
+  background: var(--w-layer2);
+  border: 1px solid var(--w-stroke);
+  color: var(--w-text);
+  font-size: 12.5px;
+  cursor: pointer;
+}
+
+.pin-wide:hover { background: #3a3a3a; }
+.pin-wide.on { color: #ff8a8a; border-color: rgba(255, 120, 120, 0.4); }
+
+.pin-wide.light {
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 2px;
+  background: #e1e1e1;
+  border-color: #adadad;
+  color: #000;
+  font-size: 12px;
+}
+
+.pin-wide.light:hover { background: #e5f1fb; border-color: #0078d7; }
+.pin-wide.light.on { color: #c42b1c; }
+
+.mmc-dhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.mmc-dhead b { margin: 0; }
+
+.cap.pin { color: #ff8a8a; }
+.win.light .cap.pin { color: #c42b1c; }
+
+/* 연결 보드 위쪽 (스크롤해도 붙어 있음) */
+.board-top {
+  position: sticky;
+  top: -16px;
+  z-index: 5;
+  margin: -16px -24px 0;
+  padding: 16px 24px 10px;
+  background: linear-gradient(180deg, #3f2d1c 85%, rgba(63, 45, 28, 0));
+}
+
+.board-top .board-lead { margin: 0 0 8px; }
+
+.link-ask {
+  position: relative;
+  padding: 12px 14px 12px;
+  border-radius: 10px;
+  background: #1c150d;
+  border: 1px solid rgba(242, 180, 90, 0.45);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.45);
+  animation: rise 0.2s;
+}
+
+.link-ask p {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 6px;
+  font-size: 13px;
+  color: #ffe3b8;
+}
+
+.link-ask p span { color: #e0353f; font-weight: 700; }
+
+.link-ask h6 {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #c9b896;
+}
+
+.link-cancel {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-size: 12px;
+  color: #a8987a;
+  cursor: pointer;
+}
+
+/* 단어 카드 */
+.bank {
+  display: grid;
+  gap: 6px;
+}
+
+.bank-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.bank-row small {
+  width: 34px;
+  flex: none;
+  font-size: 11px;
+  color: #a8987a;
+}
+
+.bank-row.off { display: none; }
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px 0 8px;
+  border-radius: 4px;
+  background: #f6efdf;
+  color: #2b2118;
+  font: 600 12.5px var(--sans);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.chip::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tc);
+}
+
+.chip:hover:not([disabled]) { transform: translateY(-1px); background: #fff; }
+.chip:active:not([disabled]) { transform: translateY(1px); box-shadow: none; }
+.chip[disabled] { cursor: default; }
+
+.t-person { --tc: #e2557a; }
+.t-account { --tc: #2f86d6; }
+.t-device { --tc: #1aa260; }
+.t-company { --tc: #8c5cd6; }
+.t-place { --tc: #e8930c; }
+.t-time { --tc: #6b7280; }
+.t-relation { --tc: #c2410c; }
+
+/* 보고서 빈칸 */
+.blank {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  min-width: 78px;
+  margin: 0 3px;
+  padding: 0 12px;
+  border-radius: 6px;
+  border: 1.5px dashed rgba(242, 180, 90, 0.55);
+  background: rgba(242, 180, 90, 0.05);
+  color: #a8987a;
+  font: 500 13px var(--sans);
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.blank:hover { background: rgba(242, 180, 90, 0.12); }
+
+.blank.set {
+  border-style: solid;
+  border-color: rgba(242, 180, 90, 0.7);
+  background: #f6efdf;
+  color: #2b2118;
+  font-weight: 700;
+}
+
+.blank.on {
+  border-style: solid;
+  border-color: #f5b800;
+  box-shadow: 0 0 0 3px rgba(245, 184, 0, 0.3);
+  animation: blink 1.2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  50% { box-shadow: 0 0 0 5px rgba(245, 184, 0, 0.12); }
+}
+
+/* 보고서 아래 단어 카드 받침 (스크롤해도 붙어 있음) */
+.bank-dock {
+  position: sticky;
+  bottom: -20px;
+  z-index: 5;
+  margin: 4px -24px -20px;
+  padding: 12px 24px 16px;
+  background: #1f1912;
+  border-top: 1px solid rgba(242, 180, 90, 0.3);
+  box-shadow: 0 -10px 24px rgba(0, 0, 0, 0.4);
+}
+
+.bank-dock > p {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  color: #c9b896;
+}
+
+.bank-dock > p b { color: #ffd99c; }
+
+.chip-clear {
+  margin-left: auto;
+  font-size: 12px;
+  color: #a8987a;
+  text-decoration: underline;
+  cursor: pointer;
 }

@@ -26,10 +26,10 @@
 const W = 1280;              // 게임 화면 너비
 const H = 760;               // 게임 화면 높이
 const TASKBAR = 48;          // 작업 표시줄 높이
-const SEC_PER_MIN = 2;       // 1배속에서 게임 1분 = 실제 2초 → 한 회차 약 4분
+const SEC_PER_MIN = 3;       // 1배속에서 게임 1분 = 실제 3초 → 한 회차 약 6분
 const LOOP_LEN = 120;        // 22:00 ~ 24:00
 const WIPE_AT = 118;         // 23:58 원격 초기화 시작
-const SAVE_KEY = 'coldboot_save_v2';
+const SAVE_KEY = 'coldboot_save_v3';
 const TODAY = '11월 20일 금요일';
 const COARSE = matchMedia('(pointer: coarse)').matches;
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -127,21 +127,21 @@ const WORDS = {
 const STARTER_WORDS = ['한서진', '페이로드', '강남역', '외부 거래처', '재무팀 직원', '문태경의 동생'];
 const TYPE_LABEL = { person: '인물', account: '계정', device: '기기', company: '회사', place: '장소', time: '시각', relation: '관계' };
 
-// 연결 보드: 두 카드를 이으면 생기는 추론 (추론 카드끼리도 이을 수 있음)
+// 연결 보드: 두 카드를 고르고 연결고리 단어(key 중 하나)를 고르면 생기는 추론 (추론 카드끼리도 이을 수 있음)
 const DEDUCTIONS = [
-  { id: 'd_device', pairs: [['mdmlog', 'assets']], w: [],
+  { id: 'd_device', key: ['QA-HARIN-01'], pairs: [['mdmlog', 'assets']], w: [],
     title: '명령은 하린의 PC에서', body: '초기화 명령을 보낸 QA-HARIN-01은 오하린의 업무용 PC다.' },
-  { id: 'd_alibi', pairs: [['admin', 'alibi'], ['mdmmail', 'alibi'], ['mdmlog', 'alibi']], w: [],
+  { id: 'd_alibi', key: ['kang.jh', '강준혁'], pairs: [['admin', 'alibi'], ['mdmmail', 'alibi'], ['mdmlog', 'alibi']], w: [],
     title: '계정 주인은 자리에 없었다', body: 'kang.jh의 주인 강준혁은 그 시각 부산행 KTX 안. 버튼을 누른 건 계정을 빌린 사람이다.' },
-  { id: 'd_leak', pairs: [['ask', 'perm']], w: [],
+  { id: 'd_leak', key: ['오하린', '22:18'], pairs: [['ask', 'perm']], w: [],
     title: '누가 대표에게 알렸나', body: '22:18, 서진이 하린에게만 예치금 이야기를 꺼냈다. 42분 뒤 대표가 서진의 권한을 회수했다. 그 사이에 말을 옮긴 사람이 있다.' },
-  { id: 'd_wife', pairs: [['wedding', 'ledger'], ['wedding', 'diary']], w: ['강준혁의 아내'],
+  { id: 'd_wife', key: ['윤서영'], pairs: [['wedding', 'ledger'], ['wedding', 'diary']], w: ['강준혁의 아내'],
     title: '에버그린의 대표', body: '송금을 받은 에버그린 홀딩스의 대표 윤서영은 강준혁의 아내다.' },
-  { id: 'd_plan', pairs: [['d_wife', 'd_alibi'], ['d_wife', 'admin']], w: [],
+  { id: 'd_plan', key: ['강준혁', '09:12', '부산'], pairs: [['d_wife', 'd_alibi'], ['d_wife', 'admin']], w: [],
     title: '준비된 알리바이', body: '강준혁은 사건 당일 아침 계정을 하린에게 넘기고 처가가 있는 부산으로 떠났다. 돈은 아내의 회사로 갔다. 그는 피해자가 아니다.' },
-  { id: 'd_decoy', pairs: [['taxi', 'letter'], ['decoy', 'letter'], ['taxi', 'secret'], ['decoy', 'secret']], w: [],
+  { id: 'd_decoy', key: ['강릉역'], pairs: [['taxi', 'letter'], ['decoy', 'letter'], ['taxi', 'secret'], ['decoy', 'secret']], w: [],
     title: '강릉은 미끼', body: '"어디로 간다고 말하든 믿지 마." 강릉행 택시는 남들 보라고 잡은 것이다.' },
-  { id: 'd_base', pairs: [['letter', 'photo'], ['secret', 'photo']], w: [],
+  { id: 'd_base', key: ['제천 할머니 집 다락'], pairs: [['letter', 'photo'], ['secret', 'photo']], w: [],
     title: '사다리 치우면 못 올라오는 곳', body: '편지 속 "어릴 때 숨던 데"는 제천 할머니 집 창고 위 다락, 우리 비밀기지다.' },
 ];
 
@@ -180,11 +180,18 @@ const STAGES = [
 ];
 
 // 막혔을 때 힌트 (c: 단서, d: 추론, 아직 없는 것부터 순서대로)
+function nextHint() {
+  if (Object.keys(save.clues).length < 2) return '메시지에 마우스를 올리면 오른쪽에 📌 핀이 보입니다. 메일·로그·문서 창에도 핀 단추가 있습니다. 직접 꽂아야 노트에 남습니다.';
+  if (Object.keys(save.words || {}).length < 3) return '글 속 이름, 계정, 기기, 장소, 시각에 마우스를 올리면 밑줄이 생깁니다. 누르면 보고서와 연결 보드에 쓸 단어로 모입니다.';
+  const h = HINTS.find(([k, id]) => (k === 'c' ? !save.clues[id] : !save.deds[id]));
+  return h ? h[2] : '';
+}
+
 const HINTS = [
   ['c', 'memo', '바탕화면의 COLD_BOOT_메모.txt부터 열어 보세요. 이 PC가 무엇인지 알 수 있습니다.'],
   ['c', 'assets', '받은편지함의 지난 공지도 읽어 보세요. 기기 이름마다 주인이 적혀 있습니다.'],
   ['c', 'mdmlog', '23:55에 이벤트 뷰어가 열려 있어야 볼 수 있는 기록이 있습니다. 23:58이 지나면 손쓸 수 없습니다.'],
-  ['d', 'd_device', '연결 보드에서 "초기화 명령을 보낸 기기"와 "기기 이름의 주인이 적힌 자료"를 이어 보세요.'],
+  ['d', 'd_device', '"초기화 명령을 보낸 기기"와 "기기 이름의 주인이 적힌 자료"를 이어 보세요. 연결고리는 두 카드에 모두 나오는 기기 이름입니다.'],
   ['c', 'alibi', '개발팀 단톡방은 22시 50분쯤 한 번 더 울립니다.'],
   ['d', 'd_alibi', '관리자 계정의 주인은 그 시각 어디에 있었나요? 계정에 관한 단서와 그의 행방을 이어 보세요.'],
   ['c', 'zip', '22:31쯤 다운로드 폴더에 새 파일이 생깁니다.'],
@@ -466,6 +473,7 @@ const COUNT = {
 };
 
 const BOOT_TIPS = [
+  '중요해 보이는 것은 직접 📌 핀을 꽂아야 노트에 남습니다. 글 속 단어는 눌러서 모읍니다.',
   '창은 여러 개 띄울 수 있습니다. 하지만 모든 것을 동시에 볼 수는 없습니다.',
   '수사 노트를 여는 동안에는 재생이 멈춥니다. 아래 타임라인의 호박색 표시는 이미 알아낸 사건의 시각입니다.',
   '이전 회차에서 알아낸 것은 이번 회차에서 바로 쓸 수 있습니다. 비밀번호처럼.',
@@ -535,6 +543,7 @@ function icon(name, size = 40) {
 const SVG_MIN = '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M0 5.5h10" stroke="currentColor" stroke-width="1"/></svg>';
 const SVG_MAX = '<svg width="10" height="10" viewBox="0 0 10 10"><rect x=".5" y=".5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
 const SVG_X = '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M.5.5l9 9M9.5.5l-9 9" stroke="currentColor" stroke-width="1"/></svg>';
+const SVG_PIN = '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3l6 6-3 1-4 4 .5 4.5L13 20l-4-4-5 5-1-1 5-5-4-4 1.5-1.5L10 10l4-4z" fill="currentColor"/></svg>';
 const SVG_WARN = '<svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8 22.4 20.5H1.6z" fill="#ff4d5e"/><rect x="11" y="9" width="2" height="6.5" rx="1" fill="#2a0006"/><circle cx="12" cy="18" r="1.3" fill="#2a0006"/></svg>';
 
 // 사진 (SVG로 그린 그림)
@@ -897,7 +906,7 @@ const Sound = (() => {
    --------------------------------------------------------- */
 
 function defaultSave() {
-  return { loop: 1, clues: {}, deds: {}, stage: 0, intro: false, solved: false, reports: 0, memo: '', answers: {}, sound: true };
+  return { loop: 1, clues: {}, words: {}, deds: {}, stage: 0, intro: false, solved: false, reports: 0, misses: 0, memo: '', answers: {}, sound: true };
 }
 
 function loadSave() {
@@ -945,6 +954,7 @@ let lastMinute = -1;
 let notesOpen = false;
 let notesTab = 'timeline';
 let resetArmed = false;
+let lastNotesTab = null;
 const newClues = new Set();
 
 const stage = $('#stage');
@@ -973,11 +983,11 @@ const APPS = {
   mail:      { title: '메일', icon: 'mail', w: 840, h: 520, x: 190, y: 60, data: { sel: null }, render: renderMail },
   explorer:  { title: '파일 탐색기', icon: 'folder', w: 800, h: 490, x: 240, y: 80, data: { dir: 'docs' }, render: renderExplorer },
   events:    { title: '이벤트 뷰어', icon: 'log', w: 880, h: 480, x: 160, y: 110, cls: 'light', data: { sel: null }, render: renderEvents },
-  doc:       { title: '메모장', icon: 'txt', w: 600, h: 470, x: 400, y: 50, render: renderDoc },
-  photo:     { title: '사진', icon: 'img', w: 700, h: 570, x: 320, y: 30, render: renderPhoto },
-  zip:       { title: '암호 입력', icon: 'zip', w: 430, h: 300, x: 425, y: 180, cls: 'light', dialog: true, render: renderZip },
-  zipdir:    { title: 'ledger_backup', icon: 'zip', w: 600, h: 260, x: 340, y: 160, render: renderZipDir },
-  csv:       { title: '송금내역_요약.csv - 메모장', icon: 'txt', w: 760, h: 400, x: 250, y: 120, render: renderCsv },
+  doc:       { title: '메모장', icon: 'txt', pin: true, w: 600, h: 470, x: 400, y: 50, render: renderDoc },
+  photo:     { title: '사진', icon: 'img', pin: true, w: 700, h: 570, x: 320, y: 30, render: renderPhoto },
+  zip:       { title: '암호 입력', icon: 'zip', pin: true, w: 430, h: 300, x: 425, y: 180, cls: 'light', dialog: true, render: renderZip },
+  zipdir:    { title: 'ledger_backup', icon: 'zip', pin: true, w: 600, h: 260, x: 340, y: 160, render: renderZipDir },
+  csv:       { title: '송금내역_요약.csv - 메모장', icon: 'txt', pin: true, w: 760, h: 400, x: 250, y: 120, render: renderCsv },
   dialog:    { title: '', icon: 'info', w: 440, h: 200, x: 420, y: 240, dialog: true, render: renderDialog },
 };
 
@@ -1015,6 +1025,7 @@ function openApp(app, opt = {}) {
     <header class="titlebar">
       ${def.dialog ? '' : `<span class="tb-ic">${icon(ic, 16)}</span>`}
       <span class="tb-title">${esc(title)}</span>
+      ${def.pin ? `<button class="cap pin" data-a="pin" data-kind="win" title="수사 노트에 꽂기" aria-label="수사 노트에 꽂기">${SVG_PIN}</button>` : ''}
       ${def.dialog ? '' : `<button class="cap" data-a="win-min" aria-label="최소화">${SVG_MIN}</button><button class="cap" data-a="win-max" aria-label="최대화">${SVG_MAX}</button>`}
       <button class="cap close" data-a="win-close" aria-label="닫기">${SVG_X}</button>
     </header>
@@ -1154,7 +1165,7 @@ function renderMessenger(w) {
   const c = CHATS.find(x => x.id === chat);
   let lastDay = null;
   let lastWho = null;
-  const rows = vm.msgs[chat].map(m => {
+  const rows = vm.msgs[chat].map((m, idx) => {
     let html = '';
     if (m.day !== lastDay) {
       html += `<div class="day">${esc(m.day)}</div>`;
@@ -1167,12 +1178,14 @@ function renderMessenger(w) {
     lastWho = m.who;
     const body = m.deleted
       ? '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> 삭제된 메시지입니다.'
-      : esc(m.text);
+      : kw(esc(m.text));
+    const pinned = m.clue && !m.deleted && save.clues[m.clue];
+    const pin = m.deleted ? '' : `<button class="pin-btn ${pinned ? 'on' : ''}" data-a="pin" data-kind="msg" data-chat="${chat}" data-i="${idx}" title="수사 노트에 꽂기">${SVG_PIN}</button>`;
     html += `<div class="m ${me ? 'me' : ''} ${cont ? 'cont' : ''} ${m.deleted ? 'deleted' : ''} ${m.fresh && !w.min ? 'fresh' : ''}">
       ${me ? '' : (cont ? '<span class="av-gap"></span>' : avatar(p))}
       <div class="m-col">
-        ${!me && !cont ? `<span class="who">${esc(p.name)}</span>` : ''}
-        <div class="m-row"><div class="bub">${body}</div><span class="meta">${m.unread ? '<i>1</i>' : ''}${ampm(m.time)}</span></div>
+        ${!me && !cont ? `<span class="who">${kw(esc(p.name))}</span>` : ''}
+        <div class="m-row"><div class="bub">${body}</div><span class="meta">${m.unread ? '<i>1</i>' : ''}${kwTime(m.time, ampm(m.time))}</span>${pin}</div>
       </div>
     </div>`;
     if (!w.min) m.fresh = false;
@@ -1183,7 +1196,7 @@ function renderMessenger(w) {
     ? `<div class="m typing">${avatar(PEOPLE[vm.typing[chat].who])}<div class="m-col"><div class="m-row"><div class="bub"><span class="dots"><i></i><i></i><i></i></span></div></div></div></div>`
     : '';
 
-  const head = c.group ? `<b>${esc(c.title)}</b><small>${c.count}</small>` : `<b>${esc(c.title)}</b>`;
+  const head = c.group ? `<b>${esc(c.title)}</b><small>${c.count}</small>` : `<b>${kw(esc(c.title))}</b>`;
   const rail = (d, on) => `<span class="${on ? 'on' : ''}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">${d}</svg></span>`;
 
   return `<div class="msgr">
@@ -1230,12 +1243,12 @@ function renderMail(w) {
 
   const pane = sel
     ? `<article class="mail-read">
-        <h2>${esc(sel.subject)}</h2>
+        <div class="mail-top"><h2>${kw(esc(sel.subject))}</h2><button class="pin-wide ${sel.clue && save.clues[sel.clue] ? 'on' : ''}" data-a="pin" data-kind="mail" data-id="${sel.id}">${SVG_PIN} 노트에 꽂기</button></div>
         <div class="mail-meta">
           <span class="av" style="--c:#5a6b85">${esc(sel.from.slice(0, 1))}</span>
-          <div><b>${esc(sel.from)}</b> <span>&lt;${esc(sel.addr)}&gt;</span><small>받는 사람: ${esc(sel.to)} · ${esc(sel.full)}</small></div>
+          <div><b>${kw(esc(sel.from))}</b> <span>&lt;${esc(sel.addr)}&gt;</span><small>받는 사람: ${esc(sel.to)} · ${kw(esc(sel.full))}</small></div>
         </div>
-        <div class="mail-body">${sel.body}</div>
+        <div class="mail-body">${kwHtml(sel.body)}</div>
       </article>`
     : `<div class="empty">${icon('mail', 56)}<p>읽을 항목을 선택하세요</p></div>`;
 
@@ -1341,7 +1354,7 @@ function renderEvents(w) {
   const rows = vm.logs.map((l, i) => `
     <tr class="${l.fresh ? 'fresh' : ''} ${i === sel ? 'on' : ''}" data-a="ev" data-i="${i}">
       <td><span class="lv">${EV_ICON[l.lv]}${LV[l.lv]}</span></td>
-      <td>2026-11-20 ${ampm(l.time.slice(0, 5))}:${l.time.slice(6)}</td>
+      <td>2026-11-20 ${kwTime(l.time.slice(0, 5), ampm(l.time.slice(0, 5)) + ':' + l.time.slice(6))}</td>
       <td>${esc(l.src)}</td>
       <td>${EV_ID[l.src] || 0}</td>
       <td>없음</td>
@@ -1380,8 +1393,8 @@ function renderEvents(w) {
           <tbody>${rows}</tbody>
         </table></div>
         <div class="mmc-detail">
-          <b>이벤트 ${EV_ID[s.src] || 0}, ${esc(s.src)}</b>
-          <p>${esc(s.text)}</p>
+          <div class="mmc-dhead"><b>이벤트 ${EV_ID[s.src] || 0}, ${esc(s.src)}</b><button class="pin-wide light ${s.clue && save.clues[s.clue] ? 'on' : ''}" data-a="pin" data-kind="log" data-i="${vm.logs.indexOf(s)}">${SVG_PIN} 노트에 꽂기</button></div>
+          <p>${kw(esc(s.text))}</p>
           <dl><dt>로그 이름:</dt><dd>시스템</dd><dt>원본:</dt><dd>${esc(s.src)}</dd><dt>기록된 날짜:</dt><dd>2026-11-20 ${ampm(s.time.slice(0, 5))}:${s.time.slice(6)}</dd><dt>컴퓨터:</dt><dd>DEV-HANSJ-03</dd></dl>
         </div>
       </section>
@@ -1394,7 +1407,7 @@ function notepad(text) {
   const lines = text.split('\n').length;
   return `<div class="np">
     <nav class="np-menu"><span>파일</span><span>편집</span><span>보기</span></nav>
-    <pre class="np-text">${esc(text)}</pre>
+    <pre class="np-text">${kw(esc(text))}</pre>
     <footer class="np-status"><span>줄 ${lines}, 열 1</span><span>100%</span><span>Windows (CRLF)</span><span>UTF-8</span></footer>
   </div>`;
 }
@@ -1419,7 +1432,7 @@ function renderPhoto(w) {
     <div class="pv-stage"><div class="pv-frame">${p.svg}</div></div>
     <footer class="pv-info">
       <div><b>${esc(w.data.name)}</b><span>${esc(p.date)}</span></div>
-      <p><small>설명</small>${esc(p.desc)}</p>
+      <p><small>설명</small>${kw(esc(p.desc))}</p>
     </footer>
   </div>`;
 }
@@ -1624,33 +1637,45 @@ function htoast({ ic = 'notes', app = '수사 노트', title, text, onClick }) {
    창이 열려 있고(최소화 안 됨) 그 순간 화면에 있는 것만 기록된다.
    --------------------------------------------------------- */
 
-function observe() {
-  if (!running && !vm.wiping) return;
-  wins.forEach(w => {
-    if (w.min) return;
-    if (w.app === 'messenger') {
-      vm.msgs[w.data.chat].forEach(m => { if (m.clue && !m.deleted) gain(m.clue); });
-    } else if (w.app === 'events') {
-      vm.logs.forEach(l => { if (l.clue) gain(l.clue); });
-    } else if (w.app === 'mail') {
-      const m = vm.mails.find(x => x.id === w.data.sel);
-      if (m && m.clue) gain(m.clue);
-    } else if (w.app === 'csv') {
-      gain('ledger');
-    } else if (w.data.clue) {
-      gain(w.data.clue);
-    }
-  });
+// 예전에는 창에 보이기만 해도 자동으로 기록했지만, 이제는 플레이어가 직접 📌 핀을 꽂아야 한다
+function observe() {}
+
+/* 📌 핀 꽂기: 메시지, 메일, 로그, 문서 창 */
+function pinItem(t) {
+  const kind = t.dataset.kind;
+  let clue = null;
+  if (kind === 'msg') {
+    const m = vm.msgs[t.dataset.chat][+t.dataset.i];
+    clue = m && !m.deleted ? m.clue : null;
+  } else if (kind === 'mail') {
+    clue = (vm.mails.find(x => x.id === t.dataset.id) || {}).clue;
+  } else if (kind === 'log') {
+    clue = (vm.logs[+t.dataset.i] || {}).clue;
+  } else {
+    const w = winOf(t);
+    clue = w && w.data.clue;
+  }
+  if (!clue) {
+    save.misses = (save.misses || 0) + 1;
+    persist();
+    Sound.sfx('page');
+    htoast({ title: '눈에 띄는 단서는 아닌 것 같다', text: '핀을 도로 뽑았다' });
+    return;
+  }
+  if (save.clues[clue]) {
+    htoast({ title: '이미 꽂아 둔 단서', text: CLUES[clue].title, onClick: openNotes });
+    return;
+  }
+  gain(clue);
+  t.classList.add('on');
 }
 
 function gain(id) {
   if (save.clues[id] || !CLUES[id]) return;
-  const before = knownWords().size;
   save.clues[id] = save.loop;
   newClues.add(id);
   persist();
-  const added = knownWords().size - before;
-  htoast({ title: CLUES[id].title, text: added ? `수사 노트에 기록 · 보고서 단어 +${added}` : '수사 노트에 기록', onClick: openNotes });
+  htoast({ title: CLUES[id].title, text: '수사 노트에 꽂았다', onClick: openNotes });
   Sound.sfx('clue');
   updateNotesCount();
   const btn = $('#btn-notes');
@@ -1662,17 +1687,68 @@ function gain(id) {
 }
 
 // 지금까지 모은 단어 (처음부터 주는 단어 + 단서 + 추론)
+// 지금까지 모은 단어 (처음부터 주는 단어 + 직접 누른 단어 + 추론으로 얻은 단어)
 function knownWords() {
   const set = new Set(STARTER_WORDS);
-  Object.keys(save.clues).forEach(id => (CLUES[id].w || []).forEach(x => set.add(x)));
+  Object.keys(save.words || {}).forEach(x => set.add(x));
   DEDUCTIONS.forEach(d => { if (save.deds[d.id]) d.w.forEach(x => set.add(x)); });
   return set;
+}
+
+/* 글 속 단어: 마우스를 올리면 밑줄, 누르면 보고서 단어로 모임 */
+const SURFACES = Object.keys(WORDS)
+  .filter(w => WORDS[w] !== 'relation')
+  .map(w => [w, w])
+  .concat([['창고 위 다락', '제천 할머니 집 다락'], ['판교 (자택)', '판교 자택'], ['준혁 팀장님', '강준혁']])
+  .map(([s, w]) => [esc(s), w])
+  .sort((a, b) => b[0].length - a[0].length);
+const SURF_MAP = Object.fromEntries(SURFACES);
+const KW_RE = new RegExp(SURFACES.map(([s]) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|'), 'g');
+
+// 이미 이스케이프된 글에 단어 표시 달기
+function kw(text) {
+  return text.replace(KW_RE, m => {
+    const w = SURF_MAP[m];
+    return `<span class="kw ${save.words && save.words[w] ? 'got' : ''}" data-w="${esc(w)}">${m}</span>`;
+  });
+}
+
+// 메일 본문처럼 태그가 섞인 글: 태그 밖의 글자에만 표시
+function kwHtml(html) {
+  return html.split(/(<[^>]+>)/).map(part => (part.startsWith('<') ? part : kw(part))).join('');
+}
+
+// 시각 자체가 단어인 경우 (메시지 보낸 시각 등)
+function kwTime(hhmm, label) {
+  return WORDS[hhmm] === 'time'
+    ? `<span class="kw ${save.words && save.words[hhmm] ? 'got' : ''}" data-w="${hhmm}">${label}</span>`
+    : label;
+}
+
+function collectWord(w, e) {
+  if (!WORDS[w]) return;
+  const fresh = !save.words[w];
+  if (fresh) {
+    save.words[w] = save.loop;
+    persist();
+    Sound.sfx('word');
+    $$(`.kw[data-w="${CSS.escape(w)}"]`).forEach(x => x.classList.add('got'));
+    if (notesOpen) renderNotes();
+  }
+  // 누른 자리에 "+ 단어" 표시
+  const r = stage.getBoundingClientRect();
+  const pop = document.createElement('div');
+  pop.className = 'wpop' + (fresh ? '' : ' old');
+  pop.textContent = fresh ? `+ ${w}` : `${w} (이미 적음)`;
+  pop.style.left = ((e.clientX - r.left) / scale) + 'px';
+  pop.style.top = ((e.clientY - r.top) / scale - 10) + 'px';
+  stage.appendChild(pop);
+  setTimeout(() => pop.remove(), 1100);
 }
 
 function updateNotesCount() {
   $('#notes-count').textContent = Object.keys(save.clues).length + Object.keys(save.deds).length;
 }
-
 
 /* ---------------------------------------------------------
    9. 시간 흐름과 사건
@@ -2037,6 +2113,9 @@ function signIn() {
     lastFrame = performance.now();
     Sound.sfx('start');
     htoast({ ic: 'term', app: 'COLD_BOOT', title: `LOOP ${pad2(save.loop)} 재생 시작`, text: '자정까지 120분' });
+    if (save.loop === 1 && !Object.keys(save.clues).length) {
+      setTimeout(() => htoast({ title: '수사하는 법', text: '중요한 것엔 📌 핀을 꽂고, 글 속 단어는 눌러서 모으세요.' }), 1200);
+    }
   }, 3000);
 }
 
@@ -2066,7 +2145,9 @@ function closeNotes() {
   $('#notes').classList.remove('open');
   $('#veil').hidden = true;
   boardSel = null;
+  boardPair = null;
   boardMsg = null;
+  activeBlank = null;
   Sound.muffle(false);
 }
 
@@ -2084,14 +2165,18 @@ function clueCard(id) {
 
 /* 연결 보드 */
 let boardSel = null;          // 첫 번째로 고른 카드
+let boardPair = null;         // 연결고리 단어를 고르는 중인 두 카드
 let boardMsg = null;          // { kind, text }
 let boardFresh = null;        // 방금 생긴 추론 카드
+let activeBlank = null;       // 보고서에서 채우는 중인 빈칸
+
+const cardOf = id => DEDUCTIONS.find(d => d.id === id) || CLUES[id];
 
 function boardCard(id) {
   const ded = DEDUCTIONS.find(d => d.id === id);
-  const c = ded || CLUES[id];
-  const kind = ded ? 'ded' : 'clu';
-  return `<button class="bcard ${kind} ${boardSel === id ? 'sel' : ''} ${boardFresh === id ? 'fresh' : ''}" data-a="board" data-id="${id}" title="${esc(c.body)}">
+  const c = cardOf(id);
+  const on = boardSel === id || (boardPair && boardPair.includes(id));
+  return `<button class="bcard ${ded ? 'ded' : 'clu'} ${on ? 'sel' : ''} ${boardFresh === id ? 'fresh' : ''}" data-a="board" data-id="${id}" title="${esc(c.body)}">
     <i class="pin"></i>
     <span class="bc-top">${ded ? '추론' : esc(c.t || '자료')}</span>
     <b>${esc(c.title)}</b>
@@ -2099,62 +2184,97 @@ function boardCard(id) {
   </button>`;
 }
 
+// 단어 카드 묶음 (연결 보드와 보고서 공통)
+function wordBank(action, onlyType = null) {
+  const words = [...knownWords()];
+  return `<div class="bank">${Object.keys(TYPE_LABEL).map(t => {
+    const ws = words.filter(w => WORDS[w] === t);
+    if (!ws.length) return '';
+    const off = onlyType && onlyType !== t;
+    return `<div class="bank-row ${off ? 'off' : ''}"><small>${TYPE_LABEL[t]}</small>${ws.map(w =>
+      `<button class="chip t-${t}" data-a="${action}" data-w="${esc(w)}" ${off ? 'disabled' : ''}>${esc(w)}</button>`).join('')}</div>`;
+  }).join('')}</div>`;
+}
+
 function renderBoard() {
   const deds = DEDUCTIONS.filter(d => save.deds[d.id]).map(d => d.id);
   const clues = Object.keys(save.clues).sort((a, b) => (CLUES[a].t ? tm(CLUES[a].t) : -1) - (CLUES[b].t ? tm(CLUES[b].t) : -1));
   const msg = boardMsg ? `<p class="board-msg ${boardMsg.kind}">${esc(boardMsg.text)}</p>` : '';
+  const top = boardPair
+    ? `<div class="link-ask">
+        <p><b>${esc(cardOf(boardPair[0]).title)}</b><span>↔</span><b>${esc(cardOf(boardPair[1]).title)}</b></p>
+        <h6>두 단서를 잇는 연결고리는 무엇인가?</h6>
+        ${wordBank('link-word')}
+        <button class="link-cancel" data-a="link-cancel">취소</button>
+      </div>`
+    : `<p class="board-lead">카드 두 장을 고른 뒤, 둘을 잇는 <b>연결고리 단어</b>를 고르세요. 맞으면 <b>추론 카드</b>가 생깁니다. 추론 카드끼리도 이을 수 있습니다.</p>${msg}`;
   return `<div class="board" id="board">
     <svg class="thread" id="thread" aria-hidden="true"></svg>
-    <p class="board-lead">카드 두 장을 차례로 고르면 이어 봅니다. 맞는 연결이면 <b>추론 카드</b>가 생기고, 보고서를 증명하는 근거가 됩니다. 추론 카드끼리도 이을 수 있습니다.</p>
-    ${msg}
+    <div class="board-top">${top}</div>
     <h5>추론 <i>${deds.length}/${DEDUCTIONS.length}</i></h5>
     <div class="bgrid">${deds.length ? deds.map(boardCard).join('') : '<p class="nb-empty small">아직 없습니다.</p>'}</div>
     <h5>단서 <i>${clues.length}</i></h5>
-    <div class="bgrid">${clues.length ? clues.map(boardCard).join('') : '<p class="nb-empty small">단서를 모으면 이곳에 꽂힙니다.</p>'}</div>
+    <div class="bgrid">${clues.length ? clues.map(boardCard).join('') : '<p class="nb-empty small">📌 핀을 꽂은 단서가 이곳에 붙습니다.</p>'}</div>
   </div>`;
 }
 
 function pickBoard(id, el) {
+  if (boardPair) return;
   if (!boardSel) {
     boardSel = id;
     boardMsg = null;
+    el.classList.add('sel');
     Sound.sfx('pick');
-    renderNotes();
     return;
   }
-  if (boardSel === id) { boardSel = null; renderNotes(); return; }
-
-  const a = boardSel;
-  const b = id;
-  const hit = DEDUCTIONS.find(d => d.pairs.some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
-  const fromEl = $(`.bcard[data-id="${a}"]`);
+  if (boardSel === id) {
+    boardSel = null;
+    el.classList.remove('sel');
+    return;
+  }
+  boardPair = [boardSel, id];
   boardSel = null;
+  Sound.sfx('pick');
+  renderNotes();
+}
+
+function linkWord(word) {
+  const [a, b] = boardPair;
+  boardPair = null;
+  const hit = DEDUCTIONS.find(d => d.pairs.some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
 
   if (hit && save.deds[hit.id]) {
     boardMsg = { kind: 'warn', text: `이미 이어 본 연결입니다 → "${hit.title}"` };
     renderNotes();
     return;
   }
-  if (!hit) {
-    boardMsg = { kind: 'bad', text: '두 단서 사이에 연결고리가 보이지 않습니다.' };
+  if (!hit || !hit.key.includes(word)) {
+    save.misses = (save.misses || 0) + 1;
+    persist();
+    boardMsg = {
+      kind: 'bad',
+      text: hit
+        ? `두 단서는 어딘가 이어져 있는 것 같다. 하지만 "${word}"(으)로는 설명되지 않는다.`
+        : `"${word}"(으)로 두 단서를 이을 수 없다.`,
+    };
     Sound.sfx('error');
-    drawThread(fromEl, el, false);
-    setTimeout(renderNotes, 420);
+    renderNotes();
     return;
   }
 
   // 성공: 실을 잇고 추론 카드를 만든다
-  drawThread(fromEl, el, true);
+  boardMsg = null;
+  renderNotes();
+  drawThread($(`.bcard[data-id="${a}"]`), $(`.bcard[data-id="${b}"]`), true);
   Sound.sfx('connect');
   setTimeout(() => {
     save.deds[hit.id] = save.loop;
     persist();
     boardFresh = hit.id;
-    boardMsg = { kind: 'ok', text: `새 추론: ${hit.title}${hit.w.length ? ` · 보고서 단어 +${hit.w.length}` : ''}` };
+    boardMsg = { kind: 'ok', text: `새 추론: ${hit.title}${hit.w.length ? ` · 단어 +${hit.w.length}` : ''}` };
     updateNotesCount();
     renderNotes();
-    $('.nb-body').scrollTop = 0;
-  }, 650);
+  }, 700);
 }
 
 // 두 카드 사이에 빨간 실 긋기
@@ -2177,42 +2297,63 @@ function drawThread(a, b, ok) {
 const stageMsg = {};
 
 function renderReport() {
-  const words = knownWords();
+  let activeType = null;
+  const stagesHtml = STAGES.map((st, i) => {
+    const done = i < save.stage;
+    const locked = i > save.stage;
+    if (locked) {
+      return `<section class="stage locked"><header><span>${i + 1}단계</span><b>${esc(st.title)}</b></header><p class="stage-lock">${i}단계 보고서가 받아들여지면 열립니다.</p></section>`;
+    }
+    const lines = st.lines.map(line => `<p class="sent">${line.map(part => {
+      if (typeof part === 'string') return esc(part);
+      if (done) return `<span class="fill">${esc(part.a)}</span>`;
+      const cur = save.answers[part.b] || '';
+      const on = activeBlank === part.b;
+      if (on) activeType = part.type;
+      return `<button class="blank ${cur ? 'set' : ''} ${on ? 'on' : ''}" data-a="blank" data-b="${part.b}">${cur ? esc(cur) : TYPE_LABEL[part.type]}</button>`;
+    }).join('')}</p>`).join('');
+    const proof = st.need.map(d => {
+      const ok = save.deds[d];
+      return `<span class="proof ${ok ? 'ok' : ''}">${ok ? '✓ ' + esc(DEDUCTIONS.find(x => x.id === d).title) : '? 증명 필요'}</span>`;
+    }).join('');
+    const m = stageMsg[i];
+    return `<section class="stage ${done ? 'done' : ''}">
+      <header><span>${i + 1}단계</span><b>${esc(st.title)}</b>${done ? '<em class="seal">확인됨</em>' : ''}</header>
+      ${lines}
+      <div class="proofs"><small>근거</small>${proof}</div>
+      ${done
+        ? (st.reveal ? `<p class="stage-reveal">${esc(st.reveal)}</p>` : '')
+        : `<button class="rep-submit" data-a="stage-submit" data-stage="${i}">${i + 1}단계 보고서 제출</button>
+           <p class="rep-msg ${m ? m.kind : ''}" aria-live="polite">${m ? esc(m.text) : ''}</p>`}
+    </section>`;
+  }).join('');
+
+  const dock = save.stage < 3
+    ? `<div class="bank-dock">
+        <p>${activeBlank ? `<b>${TYPE_LABEL[activeType]}</b> 칸에 넣을 단어를 고르세요` : '빈칸을 누른 뒤, 아래에서 단어를 고르세요'}
+          ${activeBlank ? '<button class="chip-clear" data-a="chip-clear">칸 비우기</button>' : ''}</p>
+        ${wordBank('chip', activeBlank ? activeType : null)}
+      </div>`
+    : '';
+
   return `<div class="rep">
-    <p class="rep-lead">보고서는 세 단계입니다. 빈칸에는 <b>직접 보고 모은 단어</b>만 넣을 수 있습니다. 내용이 맞아도 연결 보드에서 증명하지 못하면 받아들여지지 않습니다.</p>
-    <p class="rep-words">모은 단어 <b>${words.size}</b>개</p>
-    ${STAGES.map((st, i) => {
-      const done = i < save.stage;
-      const locked = i > save.stage;
-      if (locked) {
-        return `<section class="stage locked"><header><span>${i + 1}단계</span><b>${esc(st.title)}</b></header><p class="stage-lock">${i}단계 보고서가 받아들여지면 열립니다.</p></section>`;
-      }
-      const lines = st.lines.map(line => `<p class="sent">${line.map(part => {
-        if (typeof part === 'string') return esc(part);
-        if (done) return `<span class="fill">${esc(part.a)}</span>`;
-        const opts = [...words].filter(x => WORDS[x] === part.type);
-        const cur = save.answers[part.b] || '';
-        return `<select class="blank ${cur ? 'set' : ''}" data-blank="${part.b}" aria-label="${TYPE_LABEL[part.type]} 빈칸">
-          <option value="">${TYPE_LABEL[part.type]} ▾</option>
-          ${opts.map(x => `<option value="${esc(x)}" ${cur === x ? 'selected' : ''}>${esc(x)}</option>`).join('')}
-        </select>`;
-      }).join('')}</p>`).join('');
-      const proof = st.need.map(d => {
-        const ok = save.deds[d];
-        return `<span class="proof ${ok ? 'ok' : ''}">${ok ? '✓ ' + esc(DEDUCTIONS.find(x => x.id === d).title) : '? 증명 필요'}</span>`;
-      }).join('');
-      const m = stageMsg[i];
-      return `<section class="stage ${done ? 'done' : ''}">
-        <header><span>${i + 1}단계</span><b>${esc(st.title)}</b>${done ? '<em class="seal">확인됨</em>' : ''}</header>
-        ${lines}
-        <div class="proofs"><small>근거</small>${proof}</div>
-        ${done
-          ? (st.reveal ? `<p class="stage-reveal">${esc(st.reveal)}</p>` : '')
-          : `<button class="rep-submit" data-a="stage-submit" data-stage="${i}">${i + 1}단계 보고서 제출</button>
-             <p class="rep-msg ${m ? m.kind : ''}" aria-live="polite">${m ? esc(m.text) : ''}</p>`}
-      </section>`;
-    }).join('')}
+    <p class="rep-lead">빈칸에는 <b>글 속에서 직접 눌러 모은 단어</b>만 넣을 수 있습니다. 내용이 맞아도 연결 보드에서 증명하지 못하면 받아들여지지 않습니다.</p>
+    ${stagesHtml}
+    ${dock}
   </div>`;
+}
+
+function fillBlank(word) {
+  if (!activeBlank) return;
+  save.answers[activeBlank] = word;
+  // 같은 단계의 다음 빈칸으로
+  const st = STAGES.find(s => s.lines.flat().some(p => typeof p === 'object' && p.b === activeBlank));
+  const blanks = st.lines.flat().filter(p => typeof p === 'object');
+  const next = blanks.find(p => !save.answers[p.b]);
+  activeBlank = next ? next.b : null;
+  persist();
+  Sound.sfx('pick');
+  renderNotes();
 }
 
 function submitStage(i) {
@@ -2290,8 +2431,10 @@ function renderNotes() {
     body = renderReport();
   }
 
-  const hint = HINTS.find(([k, id]) => (k === 'c' ? !save.clues[id] : !save.deds[id]));
-  $('#notes').classList.toggle('wide', notesTab === 'board');
+  const hint = nextHint();
+  const prev = $('#notes .nb-body');
+  const keepTop = prev && lastNotesTab === notesTab ? prev.scrollTop : 0;
+  $('#notes').classList.toggle('wide', notesTab === 'board' || notesTab === 'report');
   $('#notes').innerHTML = `
     <div class="nb-mac"><span class="mac-dots"><i></i><i></i><i></i></span><span>수사 노트 — 도윤의 MacBook</span></div>
     <header class="nb-head">
@@ -2316,6 +2459,8 @@ function renderNotes() {
       <p class="nb-hint-text" id="nb-hint-text" hidden></p>
       <button class="nb-reset" data-a="reset">${resetArmed ? '정말 지울까요? 한 번 더 누르세요' : '기록 전부 지우고 처음부터'}</button>
     </footer>`;
+  $('#notes .nb-body').scrollTop = keepTop;
+  lastNotesTab = notesTab;
   boardFresh = null;
 }
 
@@ -2363,6 +2508,7 @@ function showEnding() {
         <div><dt>찾은 단서</dt><dd>${n}/${total}</dd></div>
         <div><dt>추론</dt><dd>${Object.keys(save.deds).length}/${DEDUCTIONS.length}</dd></div>
         <div><dt>보고서 제출</dt><dd>${save.reports}회</dd></div>
+        <div><dt>헛짚음</dt><dd>${save.misses || 0}번</dd></div>
       </dl>
       <div class="end-actions">
         <button data-a="restart-all" class="primary">처음부터 다시</button>
@@ -2480,6 +2626,12 @@ function drawRain(dt) {
    14. 입력 연결과 시작
    --------------------------------------------------------- */
 
+// 글 속 단어 모으기
+document.addEventListener('click', e => {
+  const k = e.target.closest('.kw');
+  if (k) collectWord(k.dataset.w, e);
+}, true);
+
 // 버튼 클릭 (data-a)
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-a]');
@@ -2512,7 +2664,13 @@ document.addEventListener('click', e => {
     case 'sm-notes': closeStart(); openNotes(); break;
     case 'rewind': closeStart(); endLoop('manual'); break;
     case 'notes-close': closeNotes(); break;
-    case 'tab': notesTab = t.dataset.tab; boardSel = null; boardMsg = null; renderNotes(); Sound.sfx('page'); break;
+    case 'tab': notesTab = t.dataset.tab; boardSel = null; boardPair = null; boardMsg = null; activeBlank = null; renderNotes(); Sound.sfx('page'); break;
+    case 'pin': pinItem(t); break;
+    case 'link-word': linkWord(t.dataset.w); break;
+    case 'link-cancel': boardPair = null; renderNotes(); break;
+    case 'blank': activeBlank = t.dataset.b; Sound.sfx('pick'); renderNotes(); break;
+    case 'chip': fillBlank(t.dataset.w); break;
+    case 'chip-clear': if (activeBlank) { delete save.answers[activeBlank]; persist(); renderNotes(); } break;
     case 'board': pickBoard(t.dataset.id, t); break;
     case 'stage-submit': submitStage(+t.dataset.stage); break;
     case 'twist-close':
@@ -2522,9 +2680,8 @@ document.addEventListener('click', e => {
       break;
     case 'sound': toggleSound(); break;
     case 'hint': {
-      const h = HINTS.find(([k, id]) => (k === 'c' ? !save.clues[id] : !save.deds[id]));
       const p = $('#nb-hint-text');
-      if (h && p) { p.textContent = h[2]; p.hidden = false; t.hidden = true; }
+      if (p) { p.textContent = nextHint(); p.hidden = false; t.hidden = true; }
       break;
     }
     case 'reset':
@@ -2642,12 +2799,6 @@ document.addEventListener('change', e => {
     if (input) input.type = e.target.checked ? 'text' : 'password';
     return;
   }
-  const sel = e.target.closest('select[data-blank]');
-  if (!sel) return;
-  save.answers[sel.dataset.blank] = sel.value;
-  sel.classList.toggle('set', !!sel.value);
-  persist();
-  Sound.sfx('pick');
 });
 
 // 창 끌기와 포커스
