@@ -96,9 +96,11 @@
         <b id="notes-count">0</b>
       </button>
 
-      <div class="tray" aria-hidden="true">
-        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.5" r="1.6" fill="currentColor"/></svg>
-        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <div class="tray">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.5" r="1.6" fill="currentColor"/></svg>
+        <button id="btn-sound" data-a="sound" aria-label="소리 켜고 끄기" aria-pressed="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="waves" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path class="mute" d="M16 9l6 6M22 9l-6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        </button>
       </div>
 
       <div id="clock">
@@ -120,6 +122,9 @@
 
     <!-- 수사 노트 (가상 PC 바깥, 도윤의 노트북) -->
     <aside id="notes" aria-label="수사 노트"></aside>
+
+    <!-- 2단계 반전 -->
+    <div id="twist" hidden></div>
 
     <!-- 회차가 끝날 때 -->
     <div id="lost" hidden></div>

@@ -4,7 +4,7 @@
    ---------------------------------------------------------
    1. 기본 설정과 도우미
    2. 이야기 데이터 (인물, 단서, 메신저, 메일, 로그, 파일, 사건표)
-   3. 아이콘과 사진
+   3. 아이콘과 사진 (+ 3-1. 효과음)
    4. 상태와 저장
    5. 화면 크기 맞추기
    6. 창 관리
@@ -29,7 +29,7 @@ const TASKBAR = 48;          // 작업 표시줄 높이
 const SEC_PER_MIN = 2;       // 1배속에서 게임 1분 = 실제 2초 → 한 회차 약 4분
 const LOOP_LEN = 120;        // 22:00 ~ 24:00
 const WIPE_AT = 118;         // 23:58 원격 초기화 시작
-const SAVE_KEY = 'coldboot_save_v1';
+const SAVE_KEY = 'coldboot_save_v2';
 const TODAY = '11월 20일 금요일';
 const COARSE = matchMedia('(pointer: coarse)').matches;
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -66,50 +66,138 @@ const PEOPLE = {
   moon:   { name: '문태경', ch: '문', color: '#c6a4ff' },
 };
 
-// 단서: t가 있으면 타임라인에 올라감
+// 단서: t가 있으면 타임라인에 올라감, w는 이 단서를 보면 모이는 단어 (보고서 빈칸용)
 const CLUES = {
-  memo:      { title: 'COLD_BOOT의 정체', src: '바탕화면 메모', body: '서진의 PC는 매일 22:00에 스냅샷을 뜨고 그 뒤의 통신과 파일 변경을 기록한다. 지금 보는 건 11월 20일 밤의 재생이다.' },
-  diary:     { title: '비어 있는 4억 2천만 원', src: '문서 › 업무일지', body: '서진은 11월 14일, 예치금 합계가 4억 2천만 원 모자란 걸 발견했다. 출금 기록에 "에버그린 홀딩스"라는 낯선 거래처가 있다.' },
-  assets:    { title: '업무용 PC 자산 목록', src: '메일 · 총무팀', body: 'CEO-MOON-MBP = 문태경 · DEV-KANG-02 = 강준혁 · DEV-HANSJ-03 = 한서진 · QA-HARIN-01 = 오하린 (10.0.4.17)' },
-  admin:     { title: '빌려준 관리자 계정', src: '메일 · 강준혁', body: '강준혁은 배포 테스트용으로 자기 관리자 계정(kang.jh)을 QA팀 오하린에게 임시로 공유했다. MDM 콘솔 권한 포함.' },
-  usb:       { t: '22:25', title: 'USB 연결', src: '이벤트 뷰어', body: '22:25, 서진이 SanDisk 32GB USB(E:)를 꽂았다.' },
-  zip:       { t: '22:31', title: '암호 걸린 백업', src: '다운로드 폴더', body: '22:31, ledger_backup.zip이 생겼다. 암호 힌트: "제천 할머니 집 와이파이".' },
-  pwhint:    { t: '22:44', title: '누나가 남긴 힌트', src: '링크톡 · 우리 가족', body: '서진: "도윤아 혹시 나중에 내가 뭐 보내면, 비번은 제천 할머니 집 와이파이야."' },
-  alibi:     { t: '22:50', title: '강준혁의 알리바이', src: '링크톡 · 개발팀', body: '22:50, 강준혁은 부산행 KTX 안이며 노트북을 회사에 두고 왔다고 했다.' },
-  perm:      { t: '23:00', title: '회수된 권한', src: '메일 · 이벤트 뷰어', body: '23:00, 서진의 예치금DB 읽기 권한이 제거됐다. 변경한 사람: moon.tk (문태경).' },
-  unrevoked: { t: '23:12', title: '아직 회수되지 않은 계정', src: '링크톡 · 개발팀', body: '23:10, 문태경이 "QA팀에 공유한 관리자 계정 회수했냐"고 묻는다. 강준혁: "아직이요."' },
-  pw:        { t: '23:15', title: '비밀번호: jecheon0807', src: '링크톡 · 우리 가족', body: '23:15, 엄마가 알려준 제천 집 와이파이. 할아버지 생신(8월 7일)으로 만든 비밀번호.' },
-  deleted:   { t: '23:41', title: '2분 만에 지워진 메시지', src: '링크톡 · 오하린', body: '하린 → (대표님에게 보내려던 것) "서진이 눈치챘어요. USB에 백업까지 떠놨어요. 자정 전에 제가 준혁 팀장님 계정으로 원격 초기화 걸게요."' },
-  decoy:     { t: '23:46', title: '강릉으로 간다는 말', src: '링크톡 · 오하린', body: '23:46, 서진이 하린에게 "오늘 밤 강릉 내려간다"고 말했다. 하린의 메시지를 본 직후다.' },
-  taxi:      { t: '23:47', title: '강릉역 택시 예약', src: '메일 · 바로콜', body: '23:47, 판교 → 강릉역 택시 예약 확정 (00:10 픽업).' },
-  secret:    { t: '23:50', title: '"비밀기지 기억하지?"', src: '링크톡 · 우리 가족', body: '23:50, 서진이 가족방에: "도윤아 비밀기지 기억하지? 미안해. 엄마한테는 아직 말하지 마." 읽지 않음 1.' },
-  mdmmail:   { t: '23:55', title: '원격 초기화 승인', src: '메일 · MDM', body: '23:55, MDM 알림: 이 PC의 원격 초기화를 승인한 계정은 kang.jh (강준혁).' },
-  mdmlog:    { t: '23:55', title: '명령을 보낸 기기', src: '이벤트 뷰어', body: '23:55, WIPE 명령의 발신 기기는 QA-HARIN-01 (10.0.4.17).' },
-  ledger:    { title: '송금 내역', src: 'ledger_backup.zip', body: '고객 예치금 4억 2천만 원이 일곱 번에 걸쳐 에버그린 홀딩스로 나갔다. 일곱 건 모두 승인자는 moon.tk.' },
-  letter:    { title: '도윤에게', src: 'ledger_backup.zip', body: '"사람들이 날 찾는 곳엔 없을 거야. 어디로 간다고 말하든 믿지 마. 사다리 치우면 아무도 못 올라오는 데, 거기 있을게."' },
-  photo:     { title: '우리 비밀기지', src: '사진 폴더', body: '2009년 여름. 제천 할머니 집 창고 위 다락. 사다리를 치우면 아무도 못 올라오는 곳.' },
+  memo:      { title: 'COLD_BOOT의 정체', src: '바탕화면 메모', w: [],
+               body: '서진의 PC는 매일 22:00에 스냅샷을 뜨고 그 뒤의 통신과 파일 변경을 기록한다. 지금 보는 건 11월 20일 밤의 재생이다.' },
+  diary:     { title: '비어 있는 4억 2천만 원', src: '문서 › 업무일지', w: ['에버그린 홀딩스', '윤서영'],
+               body: '예치금이 4억 2천만 원 모자란다. 출금처는 "에버그린 홀딩스". 서진이 떼 본 등기에 적힌 대표 이름은 윤서영. "어디서 들어본 이름인데."' },
+  assets:    { title: '업무용 PC 자산 목록', src: '메일 · 총무팀', w: ['QA-HARIN-01', 'DEV-KANG-02', 'CEO-MOON-MBP', 'DEV-HANSJ-03', '오하린', '강준혁', '문태경', '박민정'],
+               body: 'CEO-MOON-MBP = 문태경 · DEV-KANG-02 = 강준혁 · DEV-HANSJ-03 = 한서진 · QA-HARIN-01 = 오하린 (10.0.4.17)' },
+  admin:     { title: '빌려준 관리자 계정', src: '메일 · 강준혁 · 11/20 09:12', w: ['kang.jh', '09:12', '오하린', '강준혁'],
+               body: '사건 당일 아침 09:12, 강준혁은 자기 관리자 계정(kang.jh)을 QA팀 오하린에게 "임시로" 공유했다. MDM 콘솔 권한 포함.' },
+  wedding:   { title: '오래된 청첩장', src: '메일 · 2025년 10월', w: ['윤서영', '강준혁', '부산'],
+               body: '"준혁 ♥ 서영, 결혼합니다." 신부 윤서영, 2025년 11월 8일 부산 해운대에서 결혼.' },
+  usb:       { t: '22:25', title: 'USB 연결', src: '이벤트 뷰어', w: [],
+               body: '22:25, 서진이 SanDisk 32GB USB(E:)를 꽂았다.' },
+  ask:       { t: '22:18', title: '서진이 하린에게 꺼낸 말', src: '링크톡 · 오하린', w: ['22:18'],
+               body: '22:18, 서진이 하린에게 처음으로 예치금 테이블 이야기를 꺼냈다. "숫자가 좀 이상해서."' },
+  zip:       { t: '22:31', title: '암호 걸린 백업', src: '다운로드 폴더', w: [],
+               body: '22:31, ledger_backup.zip이 생겼다. 암호 힌트: "제천 할머니 집 와이파이".' },
+  pwhint:    { t: '22:44', title: '누나가 남긴 힌트', src: '링크톡 · 우리 가족', w: [],
+               body: '서진: "도윤아 혹시 나중에 내가 뭐 보내면, 비번은 제천 할머니 집 와이파이야."' },
+  alibi:     { t: '22:50', title: '강준혁의 알리바이', src: '링크톡 · 개발팀', w: ['부산', '강준혁'],
+               body: '22:50, 강준혁은 부산 처가로 내려가는 KTX 안이며 노트북을 회사에 두고 왔다고 했다.' },
+  perm:      { t: '23:00', title: '회수된 권한', src: '메일 · 이벤트 뷰어', w: ['moon.tk', '23:00', 'han.seojin'],
+               body: '23:00, 서진의 예치금DB 읽기 권한이 제거됐다. 변경한 사람: moon.tk (문태경).' },
+  unrevoked: { t: '23:12', title: '아직 회수되지 않은 계정', src: '링크톡 · 개발팀', w: ['문태경'],
+               body: '23:10, 문태경이 "QA팀에 공유한 관리자 계정 회수했냐"고 묻는다. 강준혁: "아직이요."' },
+  pw:        { t: '23:15', title: '비밀번호: jecheon0807', src: '링크톡 · 우리 가족', w: [],
+               body: '23:15, 엄마가 알려준 제천 집 와이파이. 할아버지 생신(8월 7일)으로 만든 비밀번호.' },
+  deleted:   { t: '23:41', title: '2분 만에 지워진 메시지', src: '링크톡 · 오하린', w: ['23:41', '오하린', '문태경', '강준혁'],
+               body: '하린 → (대표님에게 보내려던 것) "서진이 눈치챘어요. USB에 백업까지 떠놨어요. 자정 전에 제가 준혁 팀장님 계정으로 원격 초기화 걸게요."' },
+  decoy:     { t: '23:46', title: '강릉으로 간다는 말', src: '링크톡 · 오하린', w: ['강릉역'],
+               body: '23:46, 서진이 하린에게 "오늘 밤 강릉 내려간다"고 말했다. 하린의 메시지를 본 직후다.' },
+  taxi:      { t: '23:47', title: '강릉역 택시 예약', src: '메일 · 바로콜', w: ['강릉역', '판교 자택', '바로콜'],
+               body: '23:47, 판교 → 강릉역 택시 예약 확정 (00:10 픽업).' },
+  secret:    { t: '23:50', title: '"비밀기지 기억하지?"', src: '링크톡 · 우리 가족', w: [],
+               body: '23:50, 서진이 가족방에: "도윤아 비밀기지 기억하지? 미안해. 엄마한테는 아직 말하지 마." 읽지 않음 1.' },
+  mdmmail:   { t: '23:55', title: '원격 초기화 승인', src: '메일 · MDM', w: ['kang.jh', '23:55'],
+               body: '23:55, MDM 알림: 이 PC의 원격 초기화를 승인한 계정은 kang.jh (강준혁).' },
+  mdmlog:    { t: '23:55', title: '명령을 보낸 기기', src: '이벤트 뷰어', w: ['QA-HARIN-01', 'kang.jh', '23:55'],
+               body: '23:55, WIPE 명령의 발신 기기는 QA-HARIN-01 (10.0.4.17).' },
+  ledger:    { title: '송금 내역', src: 'ledger_backup.zip', w: ['에버그린 홀딩스', 'moon.tk', '윤서영'],
+               body: '고객 예치금 4억 2천만 원이 일곱 번에 걸쳐 에버그린 홀딩스로 나갔다. 승인자는 모두 moon.tk. 에버그린의 법인 대표는 윤서영.' },
+  letter:    { title: '도윤에게', src: 'ledger_backup.zip', w: [],
+               body: '"사람들이 날 찾는 곳엔 없을 거야. 어디로 간다고 말하든 믿지 마. 사다리 치우면 아무도 못 올라오는 데, 거기 있을게."' },
+  photo:     { title: '우리 비밀기지', src: '사진 폴더', w: ['제천 할머니 집 다락'],
+               body: '2009년 여름. 제천 할머니 집 창고 위 다락. 사다리를 치우면 아무도 못 올라오는 곳.' },
 };
 
-// 막혔을 때 힌트 (아직 못 찾은 단서 순서대로)
-const HINTS = [
-  ['memo', '바탕화면의 COLD_BOOT_메모.txt부터 열어 보세요. 이 PC가 무엇인지 알 수 있습니다.'],
-  ['diary', '파일 탐색기 → 문서 폴더에 서진의 업무일지가 있습니다.'],
-  ['zip', '22:31쯤 다운로드 폴더에 새 파일이 생깁니다.'],
-  ['pw', '가족 단톡방은 23시가 넘어서도 대화가 이어집니다.'],
-  ['ledger', '비밀번호를 알았다면, 다음 회차에서는 22:31 직후 바로 압축을 풀 수 있습니다.'],
-  ['assets', '받은편지함의 오래된 공지도 읽어 보세요. 기기 이름의 주인이 적혀 있습니다.'],
-  ['deleted', '23:39쯤 하린이 무언가를 입력하기 시작합니다. 그 대화창을 미리 열어 두세요. 2분 뒤에는 사라집니다.'],
-  ['mdmlog', '23:55에 이벤트 뷰어가 열려 있어야 볼 수 있는 기록이 있습니다. 23:58이 지나면 손쓸 수 없습니다.'],
-  ['photo', '사진 폴더에 서진과 도윤의 어린 시절이 있습니다.'],
+// 보고서 빈칸에 넣을 수 있는 단어와 종류
+const WORDS = {
+  '오하린': 'person', '강준혁': 'person', '문태경': 'person', '한서진': 'person', '박민정': 'person', '윤서영': 'person',
+  'kang.jh': 'account', 'moon.tk': 'account', 'han.seojin': 'account',
+  'QA-HARIN-01': 'device', 'DEV-KANG-02': 'device', 'CEO-MOON-MBP': 'device', 'DEV-HANSJ-03': 'device',
+  '에버그린 홀딩스': 'company', '바로콜': 'company', '페이로드': 'company',
+  '부산': 'place', '강릉역': 'place', '판교 자택': 'place', '제천 할머니 집 다락': 'place', '강남역': 'place',
+  '09:12': 'time', '22:18': 'time', '23:00': 'time', '23:41': 'time', '23:55': 'time',
+  '강준혁의 아내': 'relation', '외부 거래처': 'relation', '재무팀 직원': 'relation', '문태경의 동생': 'relation',
+};
+const STARTER_WORDS = ['한서진', '페이로드', '강남역', '외부 거래처', '재무팀 직원', '문태경의 동생'];
+const TYPE_LABEL = { person: '인물', account: '계정', device: '기기', company: '회사', place: '장소', time: '시각', relation: '관계' };
+
+// 연결 보드: 두 카드를 이으면 생기는 추론 (추론 카드끼리도 이을 수 있음)
+const DEDUCTIONS = [
+  { id: 'd_device', pairs: [['mdmlog', 'assets']], w: [],
+    title: '명령은 하린의 PC에서', body: '초기화 명령을 보낸 QA-HARIN-01은 오하린의 업무용 PC다.' },
+  { id: 'd_alibi', pairs: [['admin', 'alibi'], ['mdmmail', 'alibi'], ['mdmlog', 'alibi']], w: [],
+    title: '계정 주인은 자리에 없었다', body: 'kang.jh의 주인 강준혁은 그 시각 부산행 KTX 안. 버튼을 누른 건 계정을 빌린 사람이다.' },
+  { id: 'd_leak', pairs: [['ask', 'perm']], w: [],
+    title: '누가 대표에게 알렸나', body: '22:18, 서진이 하린에게만 예치금 이야기를 꺼냈다. 42분 뒤 대표가 서진의 권한을 회수했다. 그 사이에 말을 옮긴 사람이 있다.' },
+  { id: 'd_wife', pairs: [['wedding', 'ledger'], ['wedding', 'diary']], w: ['강준혁의 아내'],
+    title: '에버그린의 대표', body: '송금을 받은 에버그린 홀딩스의 대표 윤서영은 강준혁의 아내다.' },
+  { id: 'd_plan', pairs: [['d_wife', 'd_alibi'], ['d_wife', 'admin']], w: [],
+    title: '준비된 알리바이', body: '강준혁은 사건 당일 아침 계정을 하린에게 넘기고 처가가 있는 부산으로 떠났다. 돈은 아내의 회사로 갔다. 그는 피해자가 아니다.' },
+  { id: 'd_decoy', pairs: [['taxi', 'letter'], ['decoy', 'letter'], ['taxi', 'secret'], ['decoy', 'secret']], w: [],
+    title: '강릉은 미끼', body: '"어디로 간다고 말하든 믿지 마." 강릉행 택시는 남들 보라고 잡은 것이다.' },
+  { id: 'd_base', pairs: [['letter', 'photo'], ['secret', 'photo']], w: [],
+    title: '사다리 치우면 못 올라오는 곳', body: '편지 속 "어릴 때 숨던 데"는 제천 할머니 집 창고 위 다락, 우리 비밀기지다.' },
 ];
 
-const REPORT = [
-  { id: 'q1', q: '23:58, 서진의 PC를 원격 초기화한 사람은?', answer: 'harin',
-    opts: [['kang', '강준혁 — 개발팀장, 계정 주인'], ['harin', '오하린 — QA, 서진의 친구'], ['moon', '문태경 — 대표'], ['seojin', '한서진 — 자작극']] },
-  { id: 'q2', q: '그 일을 시킨 사람은?', answer: 'moon',
-    opts: [['moon', '문태경 — 대표'], ['kang', '강준혁 — 개발팀장'], ['harin', '오하린 — 스스로 결정'], ['hacker', '외부 해커']] },
-  { id: 'q3', q: '서진은 지금 어디에 있는가?', answer: 'jecheon',
-    opts: [['gangneung', '강릉역 근처'], ['jecheon', '제천 할머니 집 창고 다락'], ['harin', '오하린의 집'], ['office', '페이로드 사무실 서버실']] },
+// 3단계 보고서: 문장 안의 빈칸을 모은 단어로 채움. need는 연결 보드에서 증명해야 하는 추론
+const B = (b, type, a) => ({ b, type, a });
+const STAGES = [
+  {
+    title: '그날 밤 무슨 일이 있었나',
+    need: ['d_device', 'd_alibi'],
+    lines: [
+      ['23시 55분, 초기화 명령은 ', B('s1_dev', 'device', 'QA-HARIN-01'), '에서 ', B('s1_acc', 'account', 'kang.jh'), ' 계정으로 보내졌다.'],
+      ['그 기기의 주인은 ', B('s1_who', 'person', '오하린'), '(이)다.'],
+      ['계정 주인 ', B('s1_owner', 'person', '강준혁'), '은(는) 그 시각 ', B('s1_place', 'place', '부산'), '행 KTX 안에 있었다.'],
+    ],
+    reveal: '버튼을 누른 건 서진의 가장 친한 친구였다. 그리고 계정 주인 강준혁은 그 시각 서울에 없었다. 여기까지는 누구라도 그렇게 생각할 것이다.',
+  },
+  {
+    title: '4억 2천만 원은 누구에게 갔나',
+    need: ['d_wife', 'd_plan'],
+    lines: [
+      ['고객 예치금은 ', B('s2_co', 'company', '에버그린 홀딩스'), '(으)로 빠져나갔고, 승인 계정은 ', B('s2_acc', 'account', 'moon.tk'), '(이)었다.'],
+      ['에버그린 홀딩스의 대표 ', B('s2_ceo', 'person', '윤서영'), '은(는) ', B('s2_rel', 'relation', '강준혁의 아내'), '(이)다.'],
+      ['관리자 계정은 사건 당일 ', B('s2_time', 'time', '09:12'), '에 하린에게 넘어갔다.'],
+    ],
+    reveal: '강준혁은 피해자가 아니었다.',
+  },
+  {
+    title: '서진은 어디에 있나',
+    need: ['d_decoy', 'd_base'],
+    lines: [
+      ['서진이 하린에게 말하고 택시까지 예약한 ', B('s3_fake', 'place', '강릉역'), '은(는) 미끼다.'],
+      ['서진은 ', B('s3_real', 'place', '제천 할머니 집 다락'), '에 있다.'],
+    ],
+    reveal: '',
+  },
+];
+
+// 막혔을 때 힌트 (c: 단서, d: 추론, 아직 없는 것부터 순서대로)
+const HINTS = [
+  ['c', 'memo', '바탕화면의 COLD_BOOT_메모.txt부터 열어 보세요. 이 PC가 무엇인지 알 수 있습니다.'],
+  ['c', 'assets', '받은편지함의 지난 공지도 읽어 보세요. 기기 이름마다 주인이 적혀 있습니다.'],
+  ['c', 'mdmlog', '23:55에 이벤트 뷰어가 열려 있어야 볼 수 있는 기록이 있습니다. 23:58이 지나면 손쓸 수 없습니다.'],
+  ['d', 'd_device', '연결 보드에서 "초기화 명령을 보낸 기기"와 "기기 이름의 주인이 적힌 자료"를 이어 보세요.'],
+  ['c', 'alibi', '개발팀 단톡방은 22시 50분쯤 한 번 더 울립니다.'],
+  ['d', 'd_alibi', '관리자 계정의 주인은 그 시각 어디에 있었나요? 계정에 관한 단서와 그의 행방을 이어 보세요.'],
+  ['c', 'zip', '22:31쯤 다운로드 폴더에 새 파일이 생깁니다.'],
+  ['c', 'pw', '가족 단톡방은 23시가 넘어서도 대화가 이어집니다.'],
+  ['c', 'ledger', '비밀번호를 알았다면, 다음 회차에서는 22:31 직후 바로 압축을 풀 수 있습니다.'],
+  ['c', 'wedding', '받은편지함 맨 아래, 오래된 메일 중에 이름 두 개가 나란히 적힌 것이 있습니다.'],
+  ['d', 'd_wife', '송금을 받은 회사의 대표 이름, 어디선가 본 적 있지 않나요?'],
+  ['d', 'd_plan', '추론 카드끼리도 이을 수 있습니다. 강준혁에 관한 두 추론을 이어 보세요.'],
+  ['c', 'letter', '압축 파일 안에는 송금 내역 말고 편지도 있습니다.'],
+  ['c', 'photo', '사진 폴더에 서진과 도윤의 어린 시절이 있습니다.'],
+  ['d', 'd_base', '편지 속 "어릴 때 숨던 데"를 보여 주는 단서가 있습니다.'],
+  ['d', 'd_decoy', '"어디로 간다고 말하든 믿지 마." 이 말과 어울리는 행동을 찾아 이어 보세요.'],
+  ['d', 'd_leak', '(보너스) 서진은 22:18에 누구에게 처음 말했나요? 그리고 23:00에 무슨 일이 있었나요?'],
 ];
 
 // 메신저 대화방과 22:00 이전 기록
@@ -177,6 +265,13 @@ const MAILS0 = [
     subject: '[바로콜] 11월 심야 할증 할인 쿠폰이 도착했어요',
     body: `<p>서진 님, 늦은 귀가길도 바로콜과 함께하세요.</p><p><span class="tag">심야 20% 할인</span> 11월 30일까지 사용 가능</p>`,
   },
+  {
+    id: 'wedding', from: '강준혁', addr: 'jh.kang@payroad.kr', to: '페이로드 전체', date: '25.10.02', full: '2025-10-02 (목) 18:20', clue: 'wedding', read: true,
+    subject: '[청첩장] 준혁 ♥ 서영, 결혼합니다',
+    body: `<div class="invite"><small>WEDDING INVITATION</small><b>강준혁 <i>♥</i> 윤서영</b><p>2025년 11월 8일 토요일 낮 12시<br>부산 해운대 라온웨딩홀 3층</p></div>
+      <p>바쁘신 와중에 꼭 와 달라는 말씀은 못 드리지만, 마음으로 축하해 주시면 감사하겠습니다. 신부 쪽이 부산이라 멀리서 예식을 올리게 됐습니다.</p>
+      <p class="sig">강준혁 드림</p>`,
+  },
 ];
 
 const LOGS0 = [
@@ -241,6 +336,8 @@ const DOCS = {
        계약서도, 세금계산서도 없음. 승인자 확인 필요.
 11/18  하린이한테 말할까 하다가 말았다.
        아직 확실하지 않으니까.
+11/19  에버그린 등기부 떼 봄. 대표 윤서영.
+       어디서 들어본 이름인데.
 11/20  오늘 밤 원본 뽑아서 백업한다.
        비번은 도윤이만 알 수 있게.
        COLD_BOOT 켜 둠.` },
@@ -289,7 +386,7 @@ const EVENTS = [
   // 링크톡 — 오하린
   { t: '22:06', type: 'msg', chat: 'harin', who: 'harin', text: '아직 일해? 다들 너 어디 갔냐고 물어보더라 ㅋㅋ' },
   { t: '22:08', type: 'msg', chat: 'harin', who: 'seojin', text: '응 확인할 게 좀 있어서' },
-  { t: '22:18', type: 'msg', chat: 'harin', who: 'seojin', text: '하린아 너 QA 서버에서 예치금 테이블 본 적 있어?' },
+  { t: '22:18', type: 'msg', chat: 'harin', who: 'seojin', clue: 'ask', text: '하린아 너 QA 서버에서 예치금 테이블 본 적 있어?' },
   { t: '22:19', type: 'msg', chat: 'harin', who: 'harin', text: '아니? 그건 대표님이랑 재무팀만 볼 수 있잖아' },
   { t: '22:19', type: 'msg', chat: 'harin', who: 'harin', text: '왜??' },
   { t: '22:21', type: 'msg', chat: 'harin', who: 'seojin', text: '아냐 그냥. 숫자가 좀 이상해서' },
@@ -321,7 +418,7 @@ const EVENTS = [
   { t: '23:50', type: 'msg', chat: 'family', who: 'seojin', unread: true, text: '미안해. 엄마한테는 아직 말하지 마' },
 
   // 링크톡 — 개발팀
-  { t: '22:50', type: 'msg', chat: 'team', who: 'kang', clue: 'alibi', text: '저 지금 부산 내려가는 KTX인데 노트북을 회사에 두고 왔네요 ㅠ 월요일까지 급한 건 전화 주세요' },
+  { t: '22:50', type: 'msg', chat: 'team', who: 'kang', clue: 'alibi', text: '저 지금 부산 처가 내려가는 KTX인데 노트북을 회사에 두고 왔네요 ㅠ 월요일까지 급한 건 전화 주세요' },
   { t: '23:10', type: 'msg', chat: 'team', who: 'moon', text: '준혁 팀장, QA팀에 공유한 관리자 계정 회수했어요?' },
   { t: '23:12', type: 'msg', chat: 'team', who: 'kang', clue: 'unrevoked', text: '아 아직이요;; 월요일 출근하자마자 바꾸겠습니다' },
   { t: '23:13', type: 'msg', chat: 'team', who: 'moon', text: '알겠어요' },
@@ -558,7 +655,7 @@ const PHOTOS = (() => {
       }),
     },
     sea: {
-clue: null, date: '2021-06-19 19:48 · 필름 카메라 앱',
+      clue: null, date: '2021-06-19 19:48 · 필름 카메라 앱',
       desc: '회사 워크숍, 강릉. 하린이랑 처음 제대로 얘기한 날. 둘이 빠져나와서 해 지는 거 봤다.',
       svg: pic({
         src: 'photo/2021_강릉_워크숍.jpg',
@@ -571,11 +668,221 @@ clue: null, date: '2021-06-19 19:48 · 필름 카메라 앱',
 
 
 /* ---------------------------------------------------------
+   3-1. 효과음 (음원 파일 없이 Web Audio로 직접 만듦)
+   --------------------------------------------------------- */
+
+const Sound = (() => {
+  let ctx = null;
+  let master, sfxBus, rainBus, rainFilter, droneGain, noise;
+  let tension = 0;
+
+  // 2초짜리 분홍 잡음 (빗소리, 종이 소리, 하드디스크 소리의 재료)
+  function makeNoise() {
+    const len = ctx.sampleRate * 2;
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0;
+    for (let i = 0; i < len; i += 1) {
+      const w = Math.random() * 2 - 1;
+      b0 = 0.99765 * b0 + w * 0.099046;
+      b1 = 0.963 * b1 + w * 0.2965164;
+      b2 = 0.57 * b2 + w * 1.0526913;
+      d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.18;
+    }
+    return buf;
+  }
+
+  // 브라우저 정책상 첫 클릭이나 키 입력 뒤에만 소리를 켤 수 있음
+  function init() {
+    if (ctx) { if (ctx.state === 'suspended') ctx.resume(); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    try { ctx = new AC(); } catch (e) { ctx = null; return; }
+
+    master = ctx.createGain();
+    master.gain.value = save.sound ? 1 : 0;
+    master.connect(ctx.destination);
+    sfxBus = ctx.createGain();
+    sfxBus.gain.value = 0.8;
+    sfxBus.connect(master);
+    noise = makeNoise();
+
+    // 빗소리
+    const rain = ctx.createBufferSource();
+    rain.buffer = noise;
+    rain.loop = true;
+    const hp = ctx.createBiquadFilter();
+    hp.type = 'highpass';
+    hp.frequency.value = 380;
+    rainFilter = ctx.createBiquadFilter();
+    rainFilter.type = 'lowpass';
+    rainFilter.frequency.value = 2400;
+    rainBus = ctx.createGain();
+    rainBus.gain.value = 0;
+    rain.connect(hp).connect(rainFilter).connect(rainBus).connect(master);
+    rain.start();
+    rainBus.gain.linearRampToValueAtTime(0.16, ctx.currentTime + 3);
+
+    // 창에 부딪히는 빗방울 (높은 대역, 천천히 흔들림)
+    const drip = ctx.createBufferSource();
+    drip.buffer = noise;
+    drip.loop = true;
+    drip.playbackRate.value = 0.7;
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    bp.frequency.value = 5200;
+    bp.Q.value = 1.2;
+    const dg = ctx.createGain();
+    dg.gain.value = 0.05;
+    const lfo = ctx.createOscillator();
+    lfo.frequency.value = 0.13;
+    const lg = ctx.createGain();
+    lg.gain.value = 0.025;
+    lfo.connect(lg).connect(dg.gain);
+    lfo.start();
+    drip.connect(bp).connect(dg).connect(rainBus);
+    drip.start();
+
+    // 자정이 다가오면 깔리는 낮은 울림
+    droneGain = ctx.createGain();
+    droneGain.gain.value = 0;
+    droneGain.connect(master);
+    [55, 82.4, 110.6].forEach((f, i) => {
+      const o = ctx.createOscillator();
+      o.type = i ? 'sine' : 'triangle';
+      o.frequency.value = f;
+      o.detune.value = i * 6;
+      o.connect(droneGain);
+      o.start();
+    });
+  }
+
+  // 짧은 음
+  function tone(freq, dur, { type = 'sine', vol = 0.1, at = 0, to = null, attack = 0.005 } = {}) {
+    const t = ctx.currentTime + at;
+    const o = ctx.createOscillator();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(sfxBus);
+    o.start(t);
+    o.stop(t + dur + 0.05);
+  }
+
+  // 짧은 잡음
+  function hiss(dur, { freq = 2000, q = 1, type = 'bandpass', vol = 0.1, at = 0 } = {}) {
+    const t = ctx.currentTime + at;
+    const src = ctx.createBufferSource();
+    src.buffer = noise;
+    const f = ctx.createBiquadFilter();
+    f.type = type;
+    f.frequency.value = freq;
+    f.Q.value = q;
+    const g = ctx.createGain();
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(f).connect(g).connect(sfxBus);
+    src.start(t, Math.random() * 1.5);
+    src.stop(t + dur + 0.05);
+  }
+
+  const SFX = {
+    msg: () => { tone(988, 0.12, { vol: 0.09 }); tone(1319, 0.18, { vol: 0.08, at: 0.08 }); },
+    mail: () => [784, 988, 1175].forEach((f, i) => tone(f, 0.3, { type: 'triangle', vol: 0.05, at: i * 0.07 })),
+    clue: () => {                                   // 연필로 적는 소리 + 맑은 두 음
+      hiss(0.05, { freq: 3500, vol: 0.05 });
+      hiss(0.07, { freq: 2800, vol: 0.04, at: 0.07 });
+      tone(660, 0.25, { type: 'triangle', vol: 0.05, at: 0.1 });
+      tone(880, 0.3, { type: 'triangle', vol: 0.04, at: 0.18 });
+    },
+    open: () => tone(520, 0.08, { vol: 0.035, to: 760 }),
+    close: () => tone(700, 0.08, { vol: 0.03, to: 420 }),
+    pick: () => hiss(0.03, { freq: 2500, type: 'highpass', vol: 0.06 }),
+    page: () => hiss(0.12, { freq: 1800, vol: 0.05 }),
+    key: () => {                                    // 하린이 입력하는 키보드 소리
+      for (let i = 0; i < 7; i += 1) hiss(0.025, { freq: 2600 + Math.random() * 1500, vol: 0.05, at: i * (0.1 + Math.random() * 0.12) });
+    },
+    remove: () => tone(620, 0.22, { vol: 0.06, to: 180 }),
+    error: () => { tone(140, 0.2, { type: 'sawtooth', vol: 0.05 }); tone(132, 0.22, { type: 'sawtooth', vol: 0.04, at: 0.02 }); },
+    reject: () => {                                 // 반려 도장
+      hiss(0.12, { freq: 300, type: 'lowpass', vol: 0.3 });
+      tone(220, 0.25, { type: 'square', vol: 0.03, at: 0.05 });
+      tone(165, 0.35, { type: 'square', vol: 0.03, at: 0.2 });
+    },
+    unlock: () => [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.25, { type: 'triangle', vol: 0.06, at: i * 0.06 })),
+    connect: () => {                                // 실을 퉁기는 소리 + 화음
+      tone(196, 0.5, { type: 'triangle', vol: 0.12, attack: 0.002 });
+      tone(392, 0.4, { vol: 0.05, attack: 0.002 });
+      [523, 659, 784].forEach((f, i) => tone(f, 0.6, { vol: 0.05, at: 0.55 + i * 0.05 }));
+    },
+    stamp: () => {                                  // 승인 도장
+      hiss(0.18, { freq: 220, type: 'lowpass', vol: 0.6 });
+      tone(70, 0.3, { vol: 0.25 });
+      [392, 523, 659].forEach((f, i) => tone(f, 0.8, { type: 'triangle', vol: 0.05, at: 0.3 + i * 0.08 }));
+    },
+    twist: () => {                                  // 반전: 낮은 충격음 + 불협화음
+      tone(41, 2.5, { vol: 0.35, attack: 0.01 });
+      hiss(1.2, { freq: 160, type: 'lowpass', vol: 0.4 });
+      tone(233, 2.2, { type: 'triangle', vol: 0.05, at: 0.3, attack: 0.4 });
+      tone(330, 2.2, { type: 'triangle', vol: 0.04, at: 0.3, attack: 0.4 });
+    },
+    alarm: () => {
+      for (let i = 0; i < 3; i += 1) {
+        tone(880, 0.16, { type: 'square', vol: 0.03, at: i * 0.4 });
+        tone(660, 0.16, { type: 'square', vol: 0.03, at: i * 0.4 + 0.2 });
+      }
+    },
+    hdd: () => {                                    // 지워지는 하드디스크
+      hiss(0.03, { freq: 1500 + Math.random() * 2000, q: 4, vol: 0.12 });
+      if (Math.random() < 0.5) hiss(0.02, { freq: 4000, q: 6, vol: 0.08, at: 0.05 });
+    },
+    beat: () => { tone(58, 0.16, { vol: 0.3 }); tone(52, 0.2, { vol: 0.24, at: 0.22 }); },
+    lost: () => { hiss(1.3, { freq: 3000, type: 'highpass', q: 0.5, vol: 0.18 }); tone(60, 0.6, { type: 'sawtooth', vol: 0.06, to: 30 }); },
+    beep: () => tone(1000, 0.14, { type: 'square', vol: 0.03 }),
+    start: () => { tone(330, 0.4, { vol: 0.05, to: 660 }); tone(495, 0.5, { vol: 0.03, at: 0.1, to: 990 }); },
+    ending: () => [262, 330, 392, 523, 659, 784].forEach((f, i) => tone(f, 1.6, { vol: 0.05, at: i * 0.22, attack: 0.05 })),
+  };
+
+  function sfx(name) {
+    if (!ctx || !save.sound || !SFX[name]) return;
+    try { SFX[name](); } catch (e) { /* 소리 실패는 게임에 영향 없음 */ }
+  }
+
+  // 23:50부터 낮은 울림이 커짐
+  function setTension(t) {
+    if (!ctx) return;
+    const v = t >= WIPE_AT ? 0.09 : t >= 110 ? 0.02 + (t - 110) / 8 * 0.05 : 0;
+    if (Math.abs(v - tension) < 0.002) return;
+    tension = v;
+    droneGain.gain.setTargetAtTime(v, ctx.currentTime, 0.5);
+  }
+
+  // 수사 노트(가상 PC 바깥)를 열면 PC 쪽 소리가 먹먹해짐
+  function muffle(on) {
+    if (!ctx) return;
+    rainFilter.frequency.setTargetAtTime(on ? 500 : 2400, ctx.currentTime, 0.15);
+    rainBus.gain.setTargetAtTime(on ? 0.07 : 0.16, ctx.currentTime, 0.2);
+    droneGain.gain.setTargetAtTime(on ? tension * 0.3 : tension, ctx.currentTime, 0.2);
+  }
+
+  function setOn(on) {
+    if (ctx) master.gain.setTargetAtTime(on ? 1 : 0, ctx.currentTime, 0.05);
+  }
+
+  return { init, sfx, setTension, muffle, setOn };
+})();
+
+
+/* ---------------------------------------------------------
    4. 상태와 저장
    --------------------------------------------------------- */
 
 function defaultSave() {
-  return { loop: 1, clues: {}, intro: false, solved: false, reports: 0, memo: '', answers: {} };
+  return { loop: 1, clues: {}, deds: {}, stage: 0, intro: false, solved: false, reports: 0, memo: '', answers: {}, sound: true };
 }
 
 function loadSave() {
@@ -702,6 +1009,7 @@ function openApp(app, opt = {}) {
   wins.set(id, w);
   focusWin(w);
   renderWin(w);
+  Sound.sfx('open');
   return w;
 }
 
@@ -731,6 +1039,7 @@ function minimizeWin(w) {
 }
 
 function closeWin(w) {
+  Sound.sfx('close');
   wins.delete(w.id);
   w.el.classList.add('closing');
   setTimeout(() => w.el.remove(), 140);
@@ -1023,13 +1332,13 @@ function renderCsv() {
   const fmt = n => n.toLocaleString('ko-KR');
   const total = LEDGER.reduce((s, r) => s + r[1], 0);
   const rows = LEDGER.map(([d, amt, memo], i) => `
-    <tr><td class="rn">${i + 2}</td><td class="mono">${d}</td><td class="num">${fmt(amt)}</td><td>에버그린 홀딩스</td><td>${memo}</td><td class="mono hl">moon.tk</td></tr>`).join('');
+    <tr><td class="rn">${i + 2}</td><td class="mono">${d}</td><td class="num">${fmt(amt)}</td><td>에버그린 홀딩스</td><td>윤서영</td><td>${memo}</td><td class="mono hl">moon.tk</td></tr>`).join('');
   return `<div class="csv">
-    <div class="csv-bar"><span class="cell-ref">F2</span><span class="fx">fx</span><span>moon.tk</span></div>
+    <div class="csv-bar"><span class="cell-ref">G2</span><span class="fx">fx</span><span>moon.tk</span></div>
     <div class="csv-scroll"><table>
-      <thead><tr><th></th><th>A · 일자</th><th>B · 금액(원)</th><th>C · 수취인</th><th>D · 적요</th><th>E · 승인자</th></tr></thead>
+      <thead><tr><th></th><th>A · 일자</th><th>B · 금액(원)</th><th>C · 수취인</th><th>D · 법인 대표</th><th>E · 적요</th><th>F · 승인자</th></tr></thead>
       <tbody>${rows}
-        <tr class="sum"><td class="rn">9</td><td>합계</td><td class="num">${fmt(total)}</td><td></td><td></td><td></td></tr>
+        <tr class="sum"><td class="rn">9</td><td>합계</td><td class="num">${fmt(total)}</td><td></td><td></td><td></td><td></td></tr>
       </tbody>
     </table></div>
     <footer class="csv-foot"># 출처: ledger_prod.withdrawals (고객 예치금 계정) · 추출 2026-11-20 22:29 · han.seojin</footer>
@@ -1177,17 +1486,32 @@ function observe() {
 
 function gain(id) {
   if (save.clues[id] || !CLUES[id]) return;
+  const before = knownWords().size;
   save.clues[id] = save.loop;
   newClues.add(id);
   persist();
-  toast({ ic: 'notes', app: 'HOST · 수사 노트에 기록', title: CLUES[id].title, host: true, onClick: openNotes });
-  $('#notes-count').textContent = Object.keys(save.clues).length;
+  const added = knownWords().size - before;
+  toast({ ic: 'notes', app: 'HOST · 수사 노트에 기록', title: CLUES[id].title, text: added ? `보고서 단어 +${added}` : '', host: true, onClick: openNotes });
+  Sound.sfx('clue');
+  updateNotesCount();
   const btn = $('#btn-notes');
   btn.classList.remove('ping');
   void btn.offsetWidth;
   btn.classList.add('ping');
   renderTimelineMarks();
   if (notesOpen) renderNotes();
+}
+
+// 지금까지 모은 단어 (처음부터 주는 단어 + 단서 + 추론)
+function knownWords() {
+  const set = new Set(STARTER_WORDS);
+  Object.keys(save.clues).forEach(id => (CLUES[id].w || []).forEach(x => set.add(x)));
+  DEDUCTIONS.forEach(d => { if (save.deds[d.id]) d.w.forEach(x => set.add(x)); });
+  return set;
+}
+
+function updateNotesCount() {
+  $('#notes-count').textContent = Object.keys(save.clues).length + Object.keys(save.deds).length;
 }
 
 
@@ -1200,6 +1524,7 @@ function fire(e) {
     case 'msg': {
       vm.msgs[e.chat].push({ day: TODAY, time: e.t, who: e.who, text: e.text, clue: e.clue, key: e.key, unread: e.unread, fresh: true });
       if (vm.typing[e.chat] && vm.typing[e.chat].who === e.who) delete vm.typing[e.chat];
+      if (e.who !== 'seojin') Sound.sfx('msg');
       if (e.who !== 'seojin' && !chatVisible(e.chat)) {
         vm.unread[e.chat] += 1;
         const c = CHATS.find(x => x.id === e.chat);
@@ -1210,16 +1535,19 @@ function fire(e) {
     }
     case 'typing':
       vm.typing[e.chat] = { who: e.who, until: tm(e.until) };
+      if (chatVisible(e.chat)) Sound.sfx('key');
       rerender('messenger');
       break;
     case 'delete': {
       const m = vm.msgs[e.chat].find(x => x.key === e.key);
       if (m) m.deleted = true;
+      if (chatVisible(e.chat)) Sound.sfx('remove');
       rerender('messenger');
       break;
     }
     case 'mail':
       vm.mails.unshift({ ...e.mail, fresh: true });
+      Sound.sfx('mail');
       toast({ ic: 'mail', app: '메일', title: e.mail.from, text: e.mail.subject, onClick: () => openApp('mail', { data: { sel: e.mail.id } }) });
       rerender('mail');
       break;
@@ -1272,10 +1600,12 @@ function frame(now) {
     updateClock();
     updateWipe();
 
+    Sound.setTension(vm.t);
     const minute = Math.floor(vm.t);
     if (minute !== lastMinute) {
       lastMinute = minute;
       observe();
+      if (vm.t >= tm('23:52')) Sound.sfx('beat');
     }
     if (vm.t >= tm('23:52') && !REDUCED && Math.random() < dt * (vm.t >= WIPE_AT ? 2.2 : 0.5)) glitchPulse();
     if (vm.t >= LOOP_LEN) endLoop('end');
@@ -1320,6 +1650,7 @@ function startWipe() {
     <ol id="wipe-files"></ol>
   </div>`;
   el.hidden = false;
+  Sound.sfx('alarm');
 }
 
 function updateWipe() {
@@ -1335,6 +1666,7 @@ function updateWipe() {
     const path = WIPE_PATHS[vm.wipeN % WIPE_PATHS.length];
     li.innerHTML = `<span>삭제</span>${esc(path)}`;
     list.appendChild(li);
+    Sound.sfx('hdd');
     while (list.children.length > 7) list.firstElementChild.remove();
     vm.wipeN += 1;
   }
@@ -1355,6 +1687,8 @@ function endLoop(reason) {
   </div>`;
   el.hidden = false;
   stage.classList.add('glitch-hard');
+  Sound.sfx('lost');
+  Sound.setTension(0);
 
   setTimeout(() => {
     save.loop += 1;
@@ -1378,9 +1712,10 @@ function boot() {
   $('#wipe').innerHTML = '';
   $('#toasts').innerHTML = '';
   $('#veil').hidden = true;
+  $('#twist').hidden = true;
   stage.classList.remove('tense', 'late', 'glitch');
   $('#loop-tag').textContent = 'LOOP ' + pad2(save.loop);
-  $('#notes-count').textContent = Object.keys(save.clues).length;
+  updateNotesCount();
   refreshBadges();
   updateClock();
   renderTimelineMarks();
@@ -1431,7 +1766,7 @@ function showBootLog() {
     ['ok', `기록 적재 ·········· 메신저 ${COUNT.msg} · 메일 ${COUNT.mail} · 시스템 로그 ${COUNT.log} · 파일 변경 1`],
     ['ok', '재생 모드 ·········· 읽기 전용 · 기록된 사건은 바뀌지 않음'],
     ['warn', '기록 종료 지점 ······ 23:58:12 · 원격 초기화 감지'],
-    ['ok', `호스트 노트 연결 ···· 단서 ${n}개 보존됨`],
+    ['ok', `호스트 노트 연결 ···· 단서 ${n}개 · 추론 ${Object.keys(save.deds).length}개 · 보고서 ${save.stage}/3 보존됨`],
     ['', ''],
     ['', `> 리플레이 ${save.loop}회차 준비 완료`],
   ];
@@ -1484,6 +1819,7 @@ function showBootLog() {
 function finishBoot() {
   const el = $('#boot');
   el.dataset.done = '1';
+  Sound.sfx('beep');
   $('#boot-fill').style.width = '100%';
   $('#boot-start').hidden = false;
   $('#boot-tip').hidden = false;
@@ -1499,6 +1835,7 @@ function startLoop() {
     el.classList.remove('leaving');
     running = true;
     lastFrame = performance.now();
+    Sound.sfx('start');
     toast({ ic: 'info', app: 'COLD_BOOT', title: '재생을 시작합니다', text: `LOOP ${pad2(save.loop)} · 자정까지 120분` });
   }, 380);
 }
@@ -1516,6 +1853,8 @@ function openNotes() {
   renderNotes();
   $('#notes').classList.add('open');
   $('#veil').hidden = false;
+  Sound.sfx('page');
+  Sound.muffle(true);
 }
 
 function closeNotes() {
@@ -1526,6 +1865,9 @@ function closeNotes() {
   newClues.clear();
   $('#notes').classList.remove('open');
   $('#veil').hidden = true;
+  boardSel = null;
+  boardMsg = null;
+  Sound.muffle(false);
 }
 
 function clueCard(id) {
@@ -1538,6 +1880,192 @@ function clueCard(id) {
       <small>${esc(c.src)} · LOOP ${pad2(save.clues[id])}에서 발견</small>
     </div>
   </article>`;
+}
+
+/* 연결 보드 */
+let boardSel = null;          // 첫 번째로 고른 카드
+let boardMsg = null;          // { kind, text }
+let boardFresh = null;        // 방금 생긴 추론 카드
+
+function boardCard(id) {
+  const ded = DEDUCTIONS.find(d => d.id === id);
+  const c = ded || CLUES[id];
+  const kind = ded ? 'ded' : 'clu';
+  return `<button class="bcard ${kind} ${boardSel === id ? 'sel' : ''} ${boardFresh === id ? 'fresh' : ''}" data-a="board" data-id="${id}" title="${esc(c.body)}">
+    <i class="pin"></i>
+    <span class="bc-top">${ded ? '추론' : esc(c.t || '자료')}</span>
+    <b>${esc(c.title)}</b>
+    <span class="bc-body">${esc(c.body)}</span>
+  </button>`;
+}
+
+function renderBoard() {
+  const deds = DEDUCTIONS.filter(d => save.deds[d.id]).map(d => d.id);
+  const clues = Object.keys(save.clues).sort((a, b) => (CLUES[a].t ? tm(CLUES[a].t) : -1) - (CLUES[b].t ? tm(CLUES[b].t) : -1));
+  const msg = boardMsg ? `<p class="board-msg ${boardMsg.kind}">${esc(boardMsg.text)}</p>` : '';
+  return `<div class="board" id="board">
+    <svg class="thread" id="thread" aria-hidden="true"></svg>
+    <p class="board-lead">카드 두 장을 차례로 고르면 이어 봅니다. 맞는 연결이면 <b>추론 카드</b>가 생기고, 보고서를 증명하는 근거가 됩니다. 추론 카드끼리도 이을 수 있습니다.</p>
+    ${msg}
+    <h5>추론 <i>${deds.length}/${DEDUCTIONS.length}</i></h5>
+    <div class="bgrid">${deds.length ? deds.map(boardCard).join('') : '<p class="nb-empty small">아직 없습니다.</p>'}</div>
+    <h5>단서 <i>${clues.length}</i></h5>
+    <div class="bgrid">${clues.length ? clues.map(boardCard).join('') : '<p class="nb-empty small">단서를 모으면 이곳에 꽂힙니다.</p>'}</div>
+  </div>`;
+}
+
+function pickBoard(id, el) {
+  if (!boardSel) {
+    boardSel = id;
+    boardMsg = null;
+    Sound.sfx('pick');
+    renderNotes();
+    return;
+  }
+  if (boardSel === id) { boardSel = null; renderNotes(); return; }
+
+  const a = boardSel;
+  const b = id;
+  const hit = DEDUCTIONS.find(d => d.pairs.some(([x, y]) => (x === a && y === b) || (x === b && y === a)));
+  const fromEl = $(`.bcard[data-id="${a}"]`);
+  boardSel = null;
+
+  if (hit && save.deds[hit.id]) {
+    boardMsg = { kind: 'warn', text: `이미 이어 본 연결입니다 → "${hit.title}"` };
+    renderNotes();
+    return;
+  }
+  if (!hit) {
+    boardMsg = { kind: 'bad', text: '두 단서 사이에 연결고리가 보이지 않습니다.' };
+    Sound.sfx('error');
+    drawThread(fromEl, el, false);
+    setTimeout(renderNotes, 420);
+    return;
+  }
+
+  // 성공: 실을 잇고 추론 카드를 만든다
+  drawThread(fromEl, el, true);
+  Sound.sfx('connect');
+  setTimeout(() => {
+    save.deds[hit.id] = save.loop;
+    persist();
+    boardFresh = hit.id;
+    boardMsg = { kind: 'ok', text: `새 추론: ${hit.title}${hit.w.length ? ` · 보고서 단어 +${hit.w.length}` : ''}` };
+    updateNotesCount();
+    renderNotes();
+    $('.nb-body').scrollTop = 0;
+  }, 650);
+}
+
+// 두 카드 사이에 빨간 실 긋기
+function drawThread(a, b, ok) {
+  const svg = $('#thread');
+  const board = $('#board');
+  if (!svg || !a || !b || !board) return;
+  const r0 = board.getBoundingClientRect();
+  const p = el => {
+    const r = el.getBoundingClientRect();
+    return [(r.left + r.width / 2 - r0.left) / scale, (r.top + 10 - r0.top) / scale];
+  };
+  const [x1, y1] = p(a);
+  const [x2, y2] = p(b);
+  const sag = Math.min(60, Math.abs(x2 - x1) * 0.2 + 24);
+  svg.innerHTML = `<path class="${ok ? 'ok' : 'no'}" d="M${x1} ${y1} Q${(x1 + x2) / 2} ${Math.max(y1, y2) + sag} ${x2} ${y2}"/>`;
+}
+
+/* 3단계 보고서 */
+const stageMsg = {};
+
+function renderReport() {
+  const words = knownWords();
+  return `<div class="rep">
+    <p class="rep-lead">보고서는 세 단계입니다. 빈칸에는 <b>직접 보고 모은 단어</b>만 넣을 수 있습니다. 내용이 맞아도 연결 보드에서 증명하지 못하면 받아들여지지 않습니다.</p>
+    <p class="rep-words">모은 단어 <b>${words.size}</b>개</p>
+    ${STAGES.map((st, i) => {
+      const done = i < save.stage;
+      const locked = i > save.stage;
+      if (locked) {
+        return `<section class="stage locked"><header><span>${i + 1}단계</span><b>${esc(st.title)}</b></header><p class="stage-lock">${i}단계 보고서가 받아들여지면 열립니다.</p></section>`;
+      }
+      const lines = st.lines.map(line => `<p class="sent">${line.map(part => {
+        if (typeof part === 'string') return esc(part);
+        if (done) return `<span class="fill">${esc(part.a)}</span>`;
+        const opts = [...words].filter(x => WORDS[x] === part.type);
+        const cur = save.answers[part.b] || '';
+        return `<select class="blank ${cur ? 'set' : ''}" data-blank="${part.b}" aria-label="${TYPE_LABEL[part.type]} 빈칸">
+          <option value="">${TYPE_LABEL[part.type]} ▾</option>
+          ${opts.map(x => `<option value="${esc(x)}" ${cur === x ? 'selected' : ''}>${esc(x)}</option>`).join('')}
+        </select>`;
+      }).join('')}</p>`).join('');
+      const proof = st.need.map(d => {
+        const ok = save.deds[d];
+        return `<span class="proof ${ok ? 'ok' : ''}">${ok ? '✓ ' + esc(DEDUCTIONS.find(x => x.id === d).title) : '? 증명 필요'}</span>`;
+      }).join('');
+      const m = stageMsg[i];
+      return `<section class="stage ${done ? 'done' : ''}">
+        <header><span>${i + 1}단계</span><b>${esc(st.title)}</b>${done ? '<em class="seal">확인됨</em>' : ''}</header>
+        ${lines}
+        <div class="proofs"><small>근거</small>${proof}</div>
+        ${done
+          ? (st.reveal ? `<p class="stage-reveal">${esc(st.reveal)}</p>` : '')
+          : `<button class="rep-submit" data-a="stage-submit" data-stage="${i}">${i + 1}단계 보고서 제출</button>
+             <p class="rep-msg ${m ? m.kind : ''}" aria-live="polite">${m ? esc(m.text) : ''}</p>`}
+      </section>`;
+    }).join('')}
+  </div>`;
+}
+
+function submitStage(i) {
+  const st = STAGES[i];
+  const blanks = st.lines.flat().filter(x => typeof x === 'object');
+  if (blanks.some(b => !save.answers[b.b])) {
+    stageMsg[i] = { kind: 'warn', text: '빈칸을 모두 채워 주세요.' };
+    renderNotes();
+    return;
+  }
+  save.reports += 1;
+  persist();
+  if (!blanks.every(b => save.answers[b.b] === b.a)) {
+    stageMsg[i] = { kind: 'bad', text: '반려 · 사실과 맞지 않는 내용이 있습니다. 어느 곳인지는 알려 주지 않습니다.' };
+    Sound.sfx('reject');
+    renderNotes();
+    return;
+  }
+  const missing = st.need.filter(d => !save.deds[d]);
+  if (missing.length) {
+    stageMsg[i] = { kind: 'warn', text: `내용은 맞는 것 같습니다. 하지만 증명되지 않은 부분이 ${missing.length}곳 있습니다. 연결 보드에서 근거를 이어 주세요.` };
+    Sound.sfx('reject');
+    renderNotes();
+    return;
+  }
+  save.stage = i + 1;
+  persist();
+  delete stageMsg[i];
+  Sound.sfx('stamp');
+  renderNotes();
+  if (i === 1) setTimeout(showTwist, 700);
+  if (i === 2) setTimeout(showEnding, 1300);
+}
+
+// 2단계 반전 화면
+function showTwist() {
+  closeNotes();
+  paused = true;
+  Sound.sfx('twist');
+  const el = $('#twist');
+  el.innerHTML = `<div class="twist-inner">
+    <small>REPORT 02 · ACCEPTED</small>
+    <h1>강준혁은 <em>피해자가 아니었다.</em></h1>
+    <ol>
+      <li><b>09:12</b> 사건 당일 아침, 자기 관리자 계정을 하린에게 넘긴다.</li>
+      <li><b>22:50</b> 처가가 있는 부산으로 가는 KTX에서 "노트북을 두고 왔다"고 알린다.</li>
+      <li><b>23:55</b> 하린이 그 계정으로 버튼을 누른다. 기록에는 kang.jh만 남는다.</li>
+    </ol>
+    <p>4억 2천만 원은 그의 아내 윤서영의 회사로 흘러갔다. 문태경은 승인했고, 하린은 실행했고, 강준혁은 처음부터 빠져나갈 길을 만들어 두었다.</p>
+    <p class="twist-q">이제 남은 질문은 하나. <b>서진은 어디에 있나.</b></p>
+    <button data-a="twist-close">계속 수사하기</button>
+  </div>`;
+  el.hidden = false;
 }
 
 function renderNotes() {
@@ -1556,18 +2084,14 @@ function renderNotes() {
     body = docs.length
       ? docs.map(clueCard).join('')
       : '<p class="nb-empty">파일, 메일, 사진에서 얻은 자료가 이곳에 모입니다.</p>';
+  } else if (notesTab === 'board') {
+    body = renderBoard();
   } else {
-    body = `<form class="rep" data-form="report">
-      <p class="rep-lead">세 질문에 답해 보고서를 제출하세요. 몇 개가 맞았는지만 알려 줍니다.</p>
-      ${REPORT.map(r => `<fieldset class="rep-q"><legend>${esc(r.q)}</legend>
-        ${r.opts.map(([v, label]) => `<label class="rep-opt"><input type="radio" name="${r.id}" value="${v}" ${save.answers[r.id] === v ? 'checked' : ''}><span>${esc(label)}</span></label>`).join('')}
-      </fieldset>`).join('')}
-      <button type="submit" class="rep-submit">보고서 제출</button>
-      <p class="rep-msg" id="rep-msg" aria-live="polite"></p>
-    </form>`;
+    body = renderReport();
   }
 
-  const hintId = HINTS.find(([id]) => !save.clues[id]);
+  const hint = HINTS.find(([k, id]) => (k === 'c' ? !save.clues[id] : !save.deds[id]));
+  $('#notes').classList.toggle('wide', notesTab === 'board');
   $('#notes').innerHTML = `
     <header class="nb-head">
       <div><small>HOST · 도윤의 노트북</small><h2>수사 노트</h2></div>
@@ -1576,43 +2100,22 @@ function renderNotes() {
     <div class="nb-stats">
       <span><small>회차</small><b>LOOP ${pad2(save.loop)}</b></span>
       <span><small>단서</small><b>${ids.length}<i>/${total}</i></b></span>
-      <span><small>멈춘 시각</small><b>${clockText(vm.t)}</b></span>
+      <span><small>추론</small><b>${Object.keys(save.deds).length}<i>/${DEDUCTIONS.length}</i></b></span>
+      <span><small>보고서</small><b>${save.stage}<i>/3</i></b></span>
     </div>
     <nav class="nb-tabs">
       <button class="${notesTab === 'timeline' ? 'on' : ''}" data-a="tab" data-tab="timeline">타임라인</button>
       <button class="${notesTab === 'files' ? 'on' : ''}" data-a="tab" data-tab="files">자료</button>
+      <button class="${notesTab === 'board' ? 'on' : ''}" data-a="tab" data-tab="board">연결 보드</button>
       <button class="${notesTab === 'report' ? 'on' : ''}" data-a="tab" data-tab="report">보고서</button>
     </nav>
     <div class="nb-body">${body}</div>
     <footer class="nb-foot">
-      ${hintId ? `<button class="nb-hint" data-a="hint">막혔을 때 힌트</button>` : ''}
+      ${hint ? `<button class="nb-hint" data-a="hint">막혔을 때 힌트</button>` : ''}
       <p class="nb-hint-text" id="nb-hint-text" hidden></p>
       <button class="nb-reset" data-a="reset">${resetArmed ? '정말 지울까요? 한 번 더 누르세요' : '기록 전부 지우고 처음부터'}</button>
     </footer>`;
-}
-
-function submitReport(form) {
-  const fd = new FormData(form);
-  const msg = $('#rep-msg');
-  const picks = REPORT.map(r => fd.get(r.id));
-  REPORT.forEach((r, i) => { if (picks[i]) save.answers[r.id] = picks[i]; });
-  persist();
-  if (picks.some(p => !p)) {
-    msg.textContent = '세 질문에 모두 답해 주세요.';
-    msg.className = 'rep-msg warn';
-    return;
-  }
-  save.reports += 1;
-  persist();
-  const right = REPORT.filter((r, i) => r.answer === picks[i]).length;
-  if (right === 3) {
-    msg.textContent = '보고서가 받아들여졌습니다.';
-    msg.className = 'rep-msg ok';
-    setTimeout(showEnding, 900);
-  } else {
-    msg.textContent = `반려 · 3개 중 ${right}개 일치. 아직 보지 못한 순간이 있습니다.`;
-    msg.className = 'rep-msg bad';
-  }
+  boardFresh = null;
 }
 
 function resetAll() {
@@ -1634,6 +2137,7 @@ function showEnding() {
   if (notesOpen) closeNotes();
   save.solved = true;
   persist();
+  Sound.sfx('ending');
   const n = Object.keys(save.clues).length;
   const total = Object.keys(CLUES).length;
   const el = $('#ending');
@@ -1649,12 +2153,14 @@ function showEnding() {
       <div class="end-text">
         <p>창고 문을 열자 먼지 냄새가 먼저 났다. 위를 보고 이름을 부르자, 한참 뒤에 다락 판자가 밀려났다.</p>
         <p>"늦었네." 서진은 손전등을 끄며 말했다. 손에는 SanDisk USB가 들려 있었다.</p>
-        <p>그날 오후, 도윤의 보고서와 USB 원본은 금융감독원과 경찰에 함께 넘겨졌다. 원격 초기화 명령을 보낸 기기는 QA-HARIN-01이었고, 2분 만에 지워진 메시지의 수신자는 문태경이었다.</p>
+        <p>"강릉 간다고 했잖아. 하린이한테." 도윤이 말하자 서진이 웃었다. "그러니까 여기 있지."</p>
+        <p>그날 오후, 도윤의 보고서와 USB 원본은 금융감독원과 경찰에 함께 넘겨졌다. 초기화 명령을 보낸 기기는 QA-HARIN-01, 송금을 승인한 계정은 moon.tk, 돈을 받은 에버그린 홀딩스의 대표는 강준혁의 아내 윤서영이었다. 부산행 KTX 표는 알리바이가 아니라 미리 짜 둔 각본이었다.</p>
         <p>COLD_BOOT 이미지는 그 뒤로 다시 켜지지 않았다.</p>
       </div>
       <dl class="end-stats">
         <div><dt>리플레이</dt><dd>${save.loop}회</dd></div>
         <div><dt>찾은 단서</dt><dd>${n}/${total}</dd></div>
+        <div><dt>추론</dt><dd>${Object.keys(save.deds).length}/${DEDUCTIONS.length}</dd></div>
         <div><dt>보고서 제출</dt><dd>${save.reports}회</dd></div>
       </dl>
       <div class="end-actions">
@@ -1801,11 +2307,19 @@ document.addEventListener('click', e => {
     case 'sm-notes': closeStart(); openNotes(); break;
     case 'rewind': closeStart(); endLoop('manual'); break;
     case 'notes-close': closeNotes(); break;
-    case 'tab': notesTab = t.dataset.tab; renderNotes(); break;
+    case 'tab': notesTab = t.dataset.tab; boardSel = null; boardMsg = null; renderNotes(); Sound.sfx('page'); break;
+    case 'board': pickBoard(t.dataset.id, t); break;
+    case 'stage-submit': submitStage(+t.dataset.stage); break;
+    case 'twist-close':
+      $('#twist').hidden = true;
+      paused = false;
+      lastFrame = performance.now();
+      break;
+    case 'sound': toggleSound(); break;
     case 'hint': {
-      const h = HINTS.find(([id]) => !save.clues[id]);
+      const h = HINTS.find(([k, id]) => (k === 'c' ? !save.clues[id] : !save.deds[id]));
       const p = $('#nb-hint-text');
-      if (h && p) { p.textContent = h[1]; p.hidden = false; t.hidden = true; }
+      if (h && p) { p.textContent = h[2]; p.hidden = false; t.hidden = true; }
       break;
     }
     case 'reset':
@@ -1896,16 +2410,16 @@ document.addEventListener('submit', e => {
     if (pw === 'jecheon0807') {
       vm.unlocked = true;
       w.data.err = false;
+      Sound.sfx('unlock');
       renderWin(w);
       toast({ ic: 'zip', app: '압축 해제', title: 'ledger_backup.zip', text: '항목 2개를 풀었습니다' });
     } else {
       w.data.err = true;
+      Sound.sfx('error');
       renderWin(w);
       const input = $('input', w.body);
       if (input) input.focus();
     }
-  } else if (form.dataset.form === 'report') {
-    submitReport(form);
   }
 });
 
@@ -1915,6 +2429,16 @@ document.addEventListener('input', e => {
     save.memo = e.target.value;
     persist();
   }
+});
+
+// 보고서 빈칸 고르기
+document.addEventListener('change', e => {
+  const sel = e.target.closest('select[data-blank]');
+  if (!sel) return;
+  save.answers[sel.dataset.blank] = sel.value;
+  sel.classList.toggle('set', !!sel.value);
+  persist();
+  Sound.sfx('pick');
 });
 
 // 창 끌기와 포커스
@@ -1959,11 +2483,32 @@ document.addEventListener('keydown', e => {
   }
 });
 
+// 소리 켜고 끄기
+function toggleSound() {
+  save.sound = !save.sound;
+  persist();
+  Sound.init();
+  Sound.setOn(save.sound);
+  renderSoundBtn();
+}
+
+function renderSoundBtn() {
+  const b = $('#btn-sound');
+  b.classList.toggle('off', !save.sound);
+  b.setAttribute('aria-pressed', String(save.sound));
+  b.title = save.sound ? '소리 끄기' : '소리 켜기';
+}
+
+// 브라우저는 사용자가 한 번 누른 뒤에야 소리를 허락함
+document.addEventListener('pointerdown', () => Sound.init());
+document.addEventListener('keydown', () => Sound.init());
+
 addEventListener('resize', fit);
 document.addEventListener('visibilitychange', () => { lastFrame = performance.now(); });
 
 // 시작
 fit();
+renderSoundBtn();
 buildCity();
 initRain();
 boot();
