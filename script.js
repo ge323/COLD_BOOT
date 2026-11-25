@@ -87,7 +87,7 @@ const CLUES = {
   mdmlog:    { t: '23:55', title: '명령을 보낸 기기', src: '이벤트 뷰어', body: '23:55, WIPE 명령의 발신 기기는 QA-HARIN-01 (10.0.4.17).' },
   ledger:    { title: '송금 내역', src: 'ledger_backup.zip', body: '고객 예치금 4억 2천만 원이 일곱 번에 걸쳐 에버그린 홀딩스로 나갔다. 일곱 건 모두 승인자는 moon.tk.' },
   letter:    { title: '도윤에게', src: 'ledger_backup.zip', body: '"사람들이 날 찾는 곳엔 없을 거야. 어디로 간다고 말하든 믿지 마. 사다리 치우면 아무도 못 올라오는 데, 거기 있을게."' },
-  photo:     { title: '우리 비밀기지', src: '사진 폴더', body: '2009년 8월 7일. 제천 할머니 집 창고 다락. 사다리를 치우면 아무도 못 올라오는 곳.' },
+  photo:     { title: '우리 비밀기지', src: '사진 폴더', body: '2009년 여름. 제천 할머니 집 창고 위 다락. 사다리를 치우면 아무도 못 올라오는 곳.' },
 };
 
 // 막혔을 때 힌트 (아직 못 찾은 단서 순서대로)
@@ -199,9 +199,9 @@ const FILES0 = {
     { name: '바로콜_영수증_1103.pdf', icon: 'pdf', kind: 'pdf', size: '88 KB', mod: '2026-11-03 23:51' },
   ],
   photos: [
-    { name: '2009_제천_할머니집.jpg', icon: 'img', kind: 'photo', ref: 'house', size: '1.2 MB', mod: '2009-08-07 15:22' },
-    { name: '2009_비밀기지.jpg', icon: 'img', kind: 'photo', ref: 'attic', size: '0.9 MB', mod: '2009-08-07 16:05' },
-    { name: '2021_강릉_워크숍.jpg', icon: 'img', kind: 'photo', ref: 'sea', size: '3.8 MB', mod: '2021-06-12 19:48' },
+    { name: '2009_제천_할머니집.jpg', icon: 'img', kind: 'photo', ref: 'house', size: '1.2 MB', mod: '2009-07-26 15:22' },
+    { name: '2009_비밀기지.jpg', icon: 'img', kind: 'photo', ref: 'attic', size: '0.9 MB', mod: '2009-07-26 16:05' },
+    { name: '2021_강릉_워크숍.jpg', icon: 'img', kind: 'photo', ref: 'sea', size: '3.8 MB', mod: '2021-06-19 19:48' },
   ],
   trash: [
     { name: '하린_생일선물.txt', icon: 'txt', kind: 'doc', ref: 'gift', size: '1 KB', mod: '2026-11-12 00:31' },
@@ -429,11 +429,19 @@ const SVG_WARN = '<svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="t
 const STAMP = (txt) => `<text x="606" y="396" text-anchor="end" font-family="JetBrains Mono, monospace" font-size="21" font-weight="700" fill="#ff8a2a" opacity=".92" style="paint-order:stroke" stroke="#ff8a2a" stroke-opacity=".25" stroke-width="4">${txt}</text>`;
 const VIGNETTE = id => `<radialGradient id="${id}" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".5"/></radialGradient>`;
 
-const PHOTOS = {
-  house: {
-    clue: 'photo', date: '2009-08-07 15:22 · DSC-W80',
-    desc: '할아버지 생신날. 제천 할머니 집. 오른쪽 창고 다락이 우리 비밀기지. (빨간 동그라미는 2019년에 내가 그린 거)',
-    svg: `<svg viewBox="0 0 640 420" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+const PHOTOS = (() => {
+  // 실제 사진 위에 디카 날짜 각인과 빨간 동그라미를 덧씌움
+  // 사진을 못 불러오면 원래 SVG 그림(fallback)을 대신 보여 줌
+  const pic = ({ src, alt, stamp, mark, fallback }) => `
+    <div style="position:relative;width:100%;height:100%;background:#000">
+      <img src="${src}" alt="${alt}" style="display:block;width:100%;height:100%;object-fit:cover"
+           onerror="this.parentNode.innerHTML=this.parentNode.querySelector('template').innerHTML">
+      ${mark ? `<i style="position:absolute;left:${mark.x};top:${mark.y};width:${mark.w};height:${mark.h};border:3px solid rgba(255,59,59,.85);border-radius:50%;transform:rotate(-8deg)"></i>` : ''}
+      ${stamp ? `<span style="position:absolute;right:4%;bottom:5%;font:700 20px var(--mono);color:#ff8a2a;text-shadow:0 0 6px rgba(255,138,42,.6);letter-spacing:.04em">${stamp}</span>` : ''}
+      <template>${fallback}</template>
+    </div>`;
+
+  const SVG_HOUSE = `<svg viewBox="0 0 640 420" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="ph-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6fa9d8"/><stop offset=".75" stop-color="#d8e8d6"/></linearGradient>
         <linearGradient id="ph-yard" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d4bf93"/><stop offset="1" stop-color="#b79c6c"/></linearGradient>
@@ -471,13 +479,9 @@ const PHOTOS = {
       <g><circle cx="424" cy="298" r="6" fill="#2b1d16"/><rect x="418" y="305" width="12" height="15" rx="2" fill="#3d7dd6"/><rect x="419" y="320" width="4" height="10" fill="#2b3a55"/><rect x="425" y="320" width="4" height="10" fill="#2b3a55"/></g>
       <rect width="640" height="420" fill="#ffb060" opacity=".08"/>
       <rect width="640" height="420" fill="url(#ph-vig)"/>
-      ${STAMP("'09 8 7")}
-    </svg>`,
-  },
-  attic: {
-    clue: 'photo', date: '2009-08-07 16:05 · DSC-W80',
-    desc: '사다리 치우면 아무도 못 올라옴. 도윤이 처음엔 엄청 무서워했음 ㅋㅋ',
-    svg: `<svg viewBox="0 0 640 420" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      ${STAMP("'09 7 26")}
+    </svg>`;
+  const SVG_ATTIC = `<svg viewBox="0 0 640 420" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="pa-beam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe7a8" stop-opacity=".34"/><stop offset="1" stop-color="#ffe7a8" stop-opacity="0"/></linearGradient>
         <radialGradient id="pa-win" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#fff6d6"/><stop offset="1" stop-color="#ffd27a"/></radialGradient>
@@ -510,13 +514,9 @@ const PHOTOS = {
       </g>
       <rect width="640" height="420" fill="#ff9040" opacity=".07"/>
       <rect width="640" height="420" fill="url(#pa-vig)"/>
-      ${STAMP("'09 8 7")}
-    </svg>`,
-  },
-  sea: {
-    clue: null, date: '2021-06-12 19:48 · iPhone',
-    desc: '회사 워크숍, 강릉. 하린이랑 처음 제대로 얘기한 날. 둘이 빠져나와서 해 지는 거 봤다.',
-    svg: `<svg viewBox="0 0 640 420" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      ${STAMP("'09 7 26")}
+    </svg>`;
+  const SVG_SEA = `<svg viewBox="0 0 640 420" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="ps-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f2f6e"/><stop offset=".45" stop-color="#a5618f"/><stop offset=".72" stop-color="#f5a77d"/></linearGradient>
         <linearGradient id="ps-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5b5f9c"/><stop offset="1" stop-color="#1f2350"/></linearGradient>
@@ -535,9 +535,39 @@ const PHOTOS = {
       <path d="M0 352Q160 336 320 348T640 344V420H0Z" fill="url(#ps-sand)"/>
       <g fill="#2a2440"><circle cx="230" cy="324" r="8"/><path d="M220 332q10-4 20 0l4 22h-28z"/><circle cx="256" cy="326" r="7.5"/><path d="M247 333q9-4 18 0l4 21h-26z"/></g>
       <rect width="640" height="420" fill="url(#ps-vig)"/>
-    </svg>`,
-  },
-};
+    </svg>`;
+
+  return {
+    house: {
+      clue: 'photo', date: '2009-07-26 15:22 · DSC-W80',
+      desc: '여름방학, 제천 할머니 집. 오른쪽 창고 위 다락이 우리 비밀기지. (빨간 동그라미는 2019년에 내가 그린 거)',
+      svg: pic({
+        src: 'photo/2009_제천_할머니집.jpg',
+        alt: '제천 할머니 집',
+        mark: { x: '81.5%', y: '9%', w: '11%', h: '17%' },   // 창고 위 다락 창문
+        fallback: SVG_HOUSE,
+      }),
+    },
+    attic: {
+      clue: 'photo', date: '2009-07-26 16:05 · DSC-W80',
+      desc: '사다리 치우면 아무도 못 올라옴. 도윤이 처음엔 엄청 무서워했음 ㅋㅋ',
+      svg: pic({
+        src: 'photo/2009_비밀기지.jpg',
+        alt: '다락 비밀기지',
+        fallback: SVG_ATTIC,
+      }),
+    },
+    sea: {
+clue: null, date: '2021-06-19 19:48 · 필름 카메라 앱',
+      desc: '회사 워크숍, 강릉. 하린이랑 처음 제대로 얘기한 날. 둘이 빠져나와서 해 지는 거 봤다.',
+      svg: pic({
+        src: 'photo/2021_강릉_워크숍.jpg',
+        alt: '강릉 바다',
+        fallback: SVG_SEA,
+      }),
+    },
+  };
+})();
 
 
 /* ---------------------------------------------------------
