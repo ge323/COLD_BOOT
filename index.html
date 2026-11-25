@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>COLD_BOOT</title>
+
+  <!-- 글꼴 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700;900&display=swap">
+
+  <!-- 디자인 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 아이콘들이 함께 쓰는 그라디언트 (한 번만 정의) -->
+  <svg class="defs" width="0" height="0" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="g-chat" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5ff0cf"/><stop offset="1" stop-color="#1b8296"/></linearGradient>
+      <linearGradient id="g-mail" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7aa6ff"/><stop offset="1" stop-color="#3550cc"/></linearGradient>
+      <linearGradient id="g-folder" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd884"/><stop offset="1" stop-color="#e59a2f"/></linearGradient>
+      <linearGradient id="g-log" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3b4768"/><stop offset="1" stop-color="#161c30"/></linearGradient>
+      <linearGradient id="g-txt" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9e0ee"/></linearGradient>
+      <linearGradient id="g-zip" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c9a8ff"/><stop offset="1" stop-color="#6d48d8"/></linearGradient>
+      <linearGradient id="g-img" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd8ff"/><stop offset="1" stop-color="#3f7fe0"/></linearGradient>
+      <linearGradient id="g-csv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#86eab0"/><stop offset="1" stop-color="#23a062"/></linearGradient>
+      <linearGradient id="g-pdf" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff8f8f"/><stop offset="1" stop-color="#d93848"/></linearGradient>
+      <linearGradient id="g-trash" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d7deec"/><stop offset="1" stop-color="#8590a8"/></linearGradient>
+      <linearGradient id="g-notes" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffd27e"/><stop offset="1" stop-color="#d08a25"/></linearGradient>
+      <linearGradient id="g-usb" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a3aecb"/><stop offset="1" stop-color="#4d5670"/></linearGradient>
+    </defs>
+  </svg>
+
+  <div id="stage">
+
+    <!-- 바탕화면 (가상 PC 안쪽) -->
+    <main id="desktop">
+      <div id="wall">
+        <div class="sky"></div>
+        <div class="moon"></div>
+        <svg id="city" viewBox="0 0 1280 712" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="glow"></div>
+        <canvas id="rain" width="1280" height="712" aria-hidden="true"></canvas>
+        <div class="glass"></div>
+      </div>
+
+      <div id="replay-tag">
+        <span class="rec"></span>
+        <b>REPLAY</b>
+        <span>2026-11-20 (금)</span>
+        <span class="sep"></span>
+        <span id="loop-tag">LOOP 01</span>
+      </div>
+
+      <div id="icons" role="list"></div>
+      <div id="windows"></div>
+    </main>
+
+    <!-- 원격 초기화 화면 -->
+    <div id="wipe" hidden></div>
+
+    <!-- 시작 메뉴 -->
+    <div id="startmenu" hidden></div>
+
+    <!-- 작업 표시줄 -->
+    <footer id="taskbar">
+      <div id="timeline" aria-hidden="true">
+        <div id="tl-fill"></div>
+        <div id="tl-marks"></div>
+        <i class="tl-wipe" title="23:58 원격 초기화"></i>
+      </div>
+
+      <button id="btn-start" class="tb-btn" aria-label="시작 메뉴">
+        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+          <defs><linearGradient id="g-start" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9fc0ff"/><stop offset="1" stop-color="#7a5cff"/></linearGradient></defs>
+          <path d="M19.5 8.2A8.5 8.5 0 1 0 20.5 12" fill="none" stroke="url(#g-start)" stroke-width="2.6" stroke-linecap="round"/>
+          <path d="M21.6 4.6 20 9.3l-4.8-1.2" fill="none" stroke="url(#g-start)" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="2.6" fill="#cfe0ff"/>
+        </svg>
+      </button>
+
+      <div id="tb-apps"></div>
+      <div class="tb-spacer"></div>
+
+      <div id="speed" role="group" aria-label="재생 속도">
+        <button data-speed="1" class="on">1×</button>
+        <button data-speed="2">2×</button>
+        <button data-speed="4">4×</button>
+      </div>
+
+      <button id="btn-notes" class="notes-btn" aria-label="수사 노트 열기">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><rect x="9" y="5" width="30" height="38" rx="4" fill="url(#g-notes)"/><rect x="9" y="5" width="7" height="38" rx="3" fill="#000" fill-opacity=".2"/><g fill="#5a3a10" fill-opacity=".6"><rect x="20" y="14" width="14" height="2.6" rx="1.3"/><rect x="20" y="20" width="11" height="2.6" rx="1.3"/><rect x="20" y="26" width="13" height="2.6" rx="1.3"/></g></svg>
+        <span>수사 노트</span>
+        <b id="notes-count">0</b>
+      </button>
+
+      <div class="tray" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M2 9a15 15 0 0 1 20 0M5.5 12.5a10 10 0 0 1 13 0M9 16a5 5 0 0 1 6 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="19.5" r="1.6" fill="currentColor"/></svg>
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </div>
+
+      <div id="clock">
+        <b id="clock-time">22:00</b>
+        <span>2026-11-20</span>
+      </div>
+    </footer>
+
+    <!-- 알림 -->
+    <div id="toasts" aria-live="polite"></div>
+
+    <!-- 수사 노트를 여는 동안 재생을 멈췄다는 표시 -->
+    <div id="veil" hidden>
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/></svg>
+        리플레이 일시정지 · 호스트에서 수사 노트를 보는 중
+      </span>
+    </div>
+
+    <!-- 수사 노트 (가상 PC 바깥, 도윤의 노트북) -->
+    <aside id="notes" aria-label="수사 노트"></aside>
+
+    <!-- 회차가 끝날 때 -->
+    <div id="lost" hidden></div>
+
+    <!-- 부팅 화면 -->
+    <div id="boot"></div>
+
+    <!-- 엔딩 -->
+    <div id="ending" hidden></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
