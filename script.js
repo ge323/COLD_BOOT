@@ -477,49 +477,64 @@ const BOOT_TIPS = [
    3. 아이콘과 사진
    --------------------------------------------------------- */
 
-const SHINE = '<rect x="4.5" y="4.5" width="39" height="39" rx="10.5" fill="none" stroke="#fff" stroke-opacity=".28"/>';
-const PAGE = (fill, extra) =>
-  `<path d="M12 4h16.5L38 13.5V41a3 3 0 0 1-3 3H12a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3z" fill="${fill}"/>` +
-  '<path d="M28.5 4v7.5a2 2 0 0 0 2 2H38z" fill="#000" fill-opacity=".16"/>' + extra;
+const PAGE = (extra, fold = '#c9d1dc') =>
+  '<path d="M11 4h18l10 10v28a2 2 0 0 1-2 2H11a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z" fill="url(#g-paper)" stroke="#b5bfcc" stroke-width=".8"/>' +
+  `<path d="M29 4v8a2 2 0 0 0 2 2h8z" fill="${fold}"/>` + extra;
 
 const ICONS = {
-  chat: '<rect x="4" y="4" width="40" height="40" rx="11" fill="url(#g-chat)"/>' + SHINE +
-    '<path d="M14 13h20a5 5 0 0 1 5 5v9a5 5 0 0 1-5 5H25l-7.5 6v-6H14a5 5 0 0 1-5-5v-9a5 5 0 0 1 5-5z" fill="#fff"/>' +
-    '<circle cx="18" cy="22.5" r="2.2" fill="#1b8296"/><circle cx="24" cy="22.5" r="2.2" fill="#1b8296"/><circle cx="30" cy="22.5" r="2.2" fill="#1b8296"/>',
-  mail: '<rect x="4" y="4" width="40" height="40" rx="11" fill="url(#g-mail)"/>' + SHINE +
-    '<rect x="10" y="14" width="28" height="20" rx="3.5" fill="#fff"/>' +
-    '<path d="M11.5 16.5 24 25.5l12.5-9" fill="none" stroke="#3550cc" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>',
-  folder: '<path d="M5 12a4 4 0 0 1 4-4h9.5l4 4H39a4 4 0 0 1 4 4v3H5z" fill="#c07d22"/>' +
-    '<path d="M5 18a3 3 0 0 1 3-3h32a3 3 0 0 1 3 3v19a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4z" fill="url(#g-folder)"/>' +
-    '<path d="M8.5 18.5h31" stroke="#fff" stroke-opacity=".6" stroke-linecap="round"/>',
-  log: '<rect x="4" y="4" width="40" height="40" rx="11" fill="url(#g-log)"/>' + SHINE +
-    '<rect x="11" y="13" width="4" height="4" rx="1" fill="#45d49a"/><rect x="18" y="13.5" width="19" height="3" rx="1.5" fill="#c9d3ea"/>' +
-    '<rect x="11" y="21" width="4" height="4" rx="1" fill="#f2b45a"/><rect x="18" y="21.5" width="15" height="3" rx="1.5" fill="#c9d3ea" opacity=".8"/>' +
-    '<rect x="11" y="29" width="4" height="4" rx="1" fill="#ff4d5e"/><rect x="18" y="29.5" width="17" height="3" rx="1.5" fill="#c9d3ea" opacity=".6"/>',
-  txt: PAGE('url(#g-txt)', '<g fill="#8a93a8"><rect x="14" y="20" width="18" height="2" rx="1"/><rect x="14" y="25" width="19" height="2" rx="1"/><rect x="14" y="30" width="14" height="2" rx="1"/><rect x="14" y="35" width="17" height="2" rx="1"/></g>'),
-  pdf: PAGE('url(#g-txt)', '<rect x="8" y="25" width="23" height="12" rx="2.5" fill="url(#g-pdf)"/><text x="19.5" y="34" text-anchor="middle" font-size="8" font-weight="700" fill="#fff" font-family="sans-serif">PDF</text>'),
-  zip: PAGE('url(#g-zip)', '<g fill="#fff" fill-opacity=".85"><rect x="20" y="5" width="4" height="3"/><rect x="24" y="8" width="4" height="3"/><rect x="20" y="11" width="4" height="3"/><rect x="24" y="14" width="4" height="3"/><rect x="20" y="17" width="4" height="3"/></g><rect x="19" y="22" width="10" height="12" rx="2" fill="#fff"/><rect x="22" y="27" width="4" height="4" rx="1" fill="#6d48d8"/>'),
-  img: '<rect x="5" y="8" width="38" height="32" rx="5" fill="url(#g-img)"/><circle cx="16" cy="18" r="4" fill="#fff4c0"/>' +
-    '<path d="M5 33 17 23l8 8 6-5 12 9v0a5 5 0 0 1-5 5H10a5 5 0 0 1-5-5z" fill="#1f4f9a"/>' +
-    '<rect x="5.5" y="8.5" width="37" height="31" rx="4.5" fill="none" stroke="#fff" stroke-opacity=".35"/>',
-  csv: PAGE('url(#g-csv)', '<g stroke="#fff" stroke-opacity=".85" stroke-width="1.4"><path d="M13 20h20M13 26h20M13 32h20M13 38h20M20 17v23M27 17v23"/></g>'),
-  trash: '<path d="M13 15h22l-2 25a3 3 0 0 1-3 3H18a3 3 0 0 1-3-3z" fill="url(#g-trash)"/><rect x="10" y="10" width="28" height="5" rx="2.5" fill="#e6ebf5"/>' +
-    '<rect x="20" y="6.5" width="8" height="4" rx="1.5" fill="#e6ebf5"/><g stroke="#5f6983" stroke-width="1.6" stroke-linecap="round"><path d="M20 20v17M24 20v17M28 20v17"/></g>',
-  usb: '<rect x="17" y="4" width="14" height="10" rx="1.5" fill="#cfd6e6"/><rect x="20" y="7" width="3" height="3" fill="#4d5670"/><rect x="25" y="7" width="3" height="3" fill="#4d5670"/>' +
-    '<rect x="13" y="13" width="22" height="31" rx="5" fill="url(#g-usb)"/><circle cx="24" cy="36" r="2.2" fill="#45d49a"/>',
-  lock: '<path d="M16 21v-5a8 8 0 0 1 16 0v5" fill="none" stroke="#cfd6e6" stroke-width="4"/><rect x="10" y="20" width="28" height="23" rx="5" fill="url(#g-zip)"/>' +
-    '<circle cx="24" cy="30" r="3.2" fill="#fff"/><rect x="23" y="31" width="2" height="6.5" rx="1" fill="#fff"/>',
-  notes: '<rect x="9" y="5" width="30" height="38" rx="4" fill="url(#g-notes)"/><rect x="9" y="5" width="7" height="38" rx="3" fill="#000" fill-opacity=".2"/>' +
-    '<g fill="#5a3a10" fill-opacity=".6"><rect x="20" y="14" width="14" height="2.6" rx="1.3"/><rect x="20" y="20" width="11" height="2.6" rx="1.3"/><rect x="20" y="26" width="13" height="2.6" rx="1.3"/></g>',
-  info: '<circle cx="24" cy="24" r="18" fill="url(#g-mail)"/><rect x="22" y="21" width="4" height="13" rx="2" fill="#fff"/><circle cx="24" cy="15.5" r="2.5" fill="#fff"/>',
+  // 노란 폴더 (뒤판 + 앞판)
+  folder: '<path d="M4 11a3 3 0 0 1 3-3h11l4 4h19a3 3 0 0 1 3 3v24a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z" fill="url(#g-folder-back)"/>' +
+    '<path d="M4 18a3 3 0 0 1 3-3h34a3 3 0 0 1 3 3v21a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z" fill="url(#g-folder)"/>' +
+    '<path d="M4.5 18.5h39" stroke="#fff3c4" stroke-opacity=".8"/>',
+  // 링크톡: 초록 말풍선
+  chat: '<path d="M24 6C13.5 6 5 12.9 5 21.4c0 5.3 3.3 10 8.4 12.8L12 41.5l8.3-4.6c1.2.2 2.4.3 3.7.3 10.5 0 19-6.9 19-15.4S34.5 6 24 6z" fill="url(#g-chat)"/>' +
+    '<path d="M24 6C13.5 6 5 12.9 5 21.4c0 1 .1 2 .4 2.9C7.2 15.7 14.900 9.6 24 9.6s16.8 6.100 18.6 14.7c.3-.9.4-1.9.4-2.9C43 12.9 34.5 6 24 6z" fill="#fff" opacity=".18"/>' +
+    '<rect x="15" y="17" width="18" height="2.6" rx="1.3" fill="#fff"/><rect x="15" y="23" width="12" height="2.6" rx="1.3" fill="#fff" opacity=".85"/>',
+  // 메일: 열린 봉투
+  mail: '<rect x="5" y="12" width="38" height="27" rx="3" fill="url(#g-mail)"/>' +
+    '<path d="M5.5 14.5 24 28l18.5-13.5" fill="none" stroke="#cfe8ff" stroke-width="2.2" stroke-linejoin="round"/>' +
+    '<path d="M5 36.5 18 25M43 36.5 30 25" stroke="#0b5fb8" stroke-width="1.6" opacity=".6"/>',
+  // 이벤트 뷰어: 기록지 + 수준 표시
+  log: '<rect x="8" y="5" width="32" height="38" rx="2.5" fill="url(#g-ev)" stroke="#9aa3ae" stroke-width=".8"/>' +
+    '<rect x="8" y="5" width="32" height="7" rx="2.5" fill="#4a78b8"/>' +
+    '<circle cx="14" cy="19" r="2.6" fill="#2f7fd8"/><rect x="19" y="17.8" width="16" height="2.4" rx="1.2" fill="#8c96a3"/>' +
+    '<path d="M14 24.6l3 5.2h-6z" fill="#f2b400"/><rect x="19" y="26" width="13" height="2.4" rx="1.2" fill="#8c96a3"/>' +
+    '<circle cx="14" cy="35" r="2.6" fill="#d83b3b"/><rect x="19" y="33.8" width="15" height="2.4" rx="1.2" fill="#8c96a3"/>',
+  txt: PAGE('<g fill="#7d8896"><rect x="14" y="19" width="20" height="1.8" rx=".9"/><rect x="14" y="24" width="20" height="1.8" rx=".9"/><rect x="14" y="29" width="16" height="1.8" rx=".9"/><rect x="14" y="34" width="18" height="1.8" rx=".9"/></g>'),
+  pdf: PAGE('<rect x="6" y="25" width="24" height="12" rx="1.5" fill="#d93025"/><text x="18" y="34" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff" font-family="Segoe UI, sans-serif">PDF</text>'),
+  csv: PAGE('<rect x="13" y="18" width="22" height="20" fill="#fff" stroke="#21a366" stroke-width="1.2"/><path d="M13 23h22M13 28h22M13 33h22M20 18v20M27 18v20" stroke="#21a366" stroke-width="1"/><rect x="13" y="18" width="22" height="5" fill="#21a366"/>'),
+  img: PAGE('<rect x="13" y="18" width="22" height="18" rx="1" fill="url(#g-photo)"/><circle cx="29" cy="22.5" r="2.2" fill="#fff6c2"/><path d="M13 36l7-8 5 5 3-3 7 6z" fill="#3c8d3a"/>'),
+  // 압축 폴더: 노란 폴더 + 지퍼
+  zip: '<path d="M4 11a3 3 0 0 1 3-3h11l4 4h19a3 3 0 0 1 3 3v24a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z" fill="url(#g-folder-back)"/>' +
+    '<path d="M4 18a3 3 0 0 1 3-3h34a3 3 0 0 1 3 3v21a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z" fill="url(#g-folder)"/>' +
+    '<rect x="20" y="15" width="8" height="27" fill="#4a4a4a"/><g fill="#d9d9d9"><rect x="21" y="16" width="3" height="2"/><rect x="24" y="19" width="3" height="2"/><rect x="21" y="22" width="3" height="2"/><rect x="24" y="25" width="3" height="2"/></g>' +
+    '<rect x="21" y="28" width="6" height="7" rx="1" fill="#c9c9c9" stroke="#333" stroke-width=".8"/>',
+  // 휴지통 (안에 종이가 들어 있음)
+  trash: '<path d="M10 14h28l-3 28a2 2 0 0 1-2 2H15a2 2 0 0 1-2-2z" fill="url(#g-bin)" stroke="#8fa0b3" stroke-width="1"/>' +
+    '<path d="M16 14l4-6 6 4 5-5 3 7z" fill="#fff" stroke="#c3ccd6" stroke-width=".8"/>' +
+    '<path d="M17 19l1.5 20M24 19v20M31 19l-1.5 20" stroke="#9fb0c2" stroke-width="1.2" opacity=".7"/>' +
+    '<ellipse cx="24" cy="14" rx="14" ry="2" fill="none" stroke="#8fa0b3" stroke-width="1"/>',
+  usb: '<rect x="17" y="4" width="14" height="10" rx="1" fill="#c9ced6"/><rect x="20" y="7" width="3" height="3" fill="#6b7280"/><rect x="25" y="7" width="3" height="3" fill="#6b7280"/>' +
+    '<rect x="13" y="13" width="22" height="31" rx="4" fill="url(#g-usb)"/><rect x="17" y="37" width="14" height="2" rx="1" fill="#22c55e"/>',
+  pc: '<rect x="5" y="8" width="38" height="25" rx="2" fill="#2b5c9e"/><rect x="7" y="10" width="34" height="21" fill="url(#g-photo)"/><rect x="20" y="33" width="8" height="5" fill="#7d8896"/><rect x="14" y="38" width="20" height="3" rx="1.5" fill="#9aa3ae"/>',
+  navDesk: '<rect x="5" y="9" width="38" height="25" rx="2" fill="#2a7fd4"/><rect x="7" y="11" width="34" height="19" fill="#5fb2ff"/><rect x="18" y="36" width="12" height="4" rx="1" fill="#2a7fd4"/>',
+  navDown: '<circle cx="24" cy="24" r="18" fill="#1aa260"/><path d="M24 13v17M16 23l8 8 8-8" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M15 35h18" stroke="#fff" stroke-width="3.4" stroke-linecap="round"/>',
+  navDocs: '<path d="M11 5h18l10 10v28H11z" fill="#4a8fe0"/><path d="M29 5v10h10z" fill="#9cc6f5"/><g fill="#fff"><rect x="16" y="22" width="16" height="2" rx="1"/><rect x="16" y="27" width="16" height="2" rx="1"/><rect x="16" y="32" width="11" height="2" rx="1"/></g>',
+  navPics: '<rect x="5" y="9" width="38" height="30" rx="3" fill="#2f86d6"/><circle cx="16" cy="19" r="3.5" fill="#fff6c2"/><path d="M5 35l12-12 8 8 6-5 12 10v0a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z" fill="#9fd4ff"/>',
+  lock: '<path d="M15 21v-6a9 9 0 0 1 18 0v6" fill="none" stroke="#8a8f98" stroke-width="4"/><rect x="10" y="20" width="28" height="23" rx="3" fill="#f2b400"/><rect x="10" y="20" width="28" height="5" fill="#ffd34d"/><circle cx="24" cy="31" r="3" fill="#5a4300"/><rect x="23" y="32" width="2" height="6" fill="#5a4300"/>',
+  info: '<circle cx="24" cy="24" r="19" fill="#0067c0"/><rect x="22" y="21" width="4" height="13" rx="1.5" fill="#fff"/><circle cx="24" cy="15" r="2.6" fill="#fff"/>',
+  notes: '<rect x="6" y="6" width="36" height="36" rx="9" fill="#fff"/><rect x="6" y="6" width="36" height="11" rx="9" fill="url(#g-notes)"/><rect x="6" y="12" width="36" height="5" fill="url(#g-notes)"/>' +
+    '<g stroke="#d6d6d6" stroke-width="1.4"><path d="M12 25h24M12 31h24M12 37h18"/></g>',
+  term: '<rect x="5" y="7" width="38" height="34" rx="7" fill="#2d2d2f"/><rect x="5" y="7" width="38" height="34" rx="7" fill="none" stroke="#5a5a5e"/><path d="M13 19l6 5-6 5" fill="none" stroke="#e5e5e5" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 30h11" stroke="#e5e5e5" stroke-width="2.4" stroke-linecap="round"/>',
 };
 
 function icon(name, size = 40) {
   return `<svg class="ico" width="${size}" height="${size}" viewBox="0 0 48 48" aria-hidden="true">${ICONS[name] || ICONS.txt}</svg>`;
 }
 
-const SVG_MIN = '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 5h8" stroke="currentColor" stroke-width="1.2"/></svg>';
-const SVG_X = '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M1 1l8 8M9 1 1 9" stroke="currentColor" stroke-width="1.2"/></svg>';
+const SVG_MIN = '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M0 5.5h10" stroke="currentColor" stroke-width="1"/></svg>';
+const SVG_MAX = '<svg width="10" height="10" viewBox="0 0 10 10"><rect x=".5" y=".5" width="9" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
+const SVG_X = '<svg width="10" height="10" viewBox="0 0 10 10"><path d="M.5.5l9 9M9.5.5l-9 9" stroke="currentColor" stroke-width="1"/></svg>';
 const SVG_WARN = '<svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8 22.4 20.5H1.6z" fill="#ff4d5e"/><rect x="11" y="9" width="2" height="6.5" rx="1" fill="#2a0006"/><circle cx="12" cy="18" r="1.3" fill="#2a0006"/></svg>';
 
 // 사진 (SVG로 그린 그림)
@@ -954,15 +969,16 @@ function fit() {
    --------------------------------------------------------- */
 
 const APPS = {
-  messenger: { title: '링크톡', icon: 'chat', w: 740, h: 520, x: 120, y: 46, data: { chat: 'harin' }, render: renderMessenger },
-  mail:      { title: '메일', icon: 'mail', w: 800, h: 520, x: 200, y: 70, data: { sel: null }, render: renderMail },
-  explorer:  { title: '파일 탐색기', icon: 'folder', w: 720, h: 460, x: 260, y: 100, data: { dir: 'docs' }, render: renderExplorer },
-  events:    { title: '이벤트 뷰어', icon: 'log', w: 840, h: 420, x: 180, y: 150, render: renderEvents },
-  doc:       { title: '메모장', icon: 'txt', w: 540, h: 470, x: 400, y: 60, render: renderDoc },
-  photo:     { title: '사진', icon: 'img', w: 680, h: 550, x: 330, y: 40, render: renderPhoto },
-  zip:       { title: 'ledger_backup.zip', icon: 'zip', w: 480, h: 390, x: 420, y: 140, render: renderZip },
-  csv:       { title: '송금내역_요약.csv', icon: 'csv', w: 780, h: 430, x: 250, y: 110, render: renderCsv },
-  dialog:    { title: '알림', icon: 'info', w: 380, h: 210, x: 450, y: 250, render: renderDialog },
+  messenger: { title: '링크톡', icon: 'chat', w: 780, h: 540, x: 110, y: 36, cls: 'light brand', data: { chat: 'harin' }, render: renderMessenger },
+  mail:      { title: '메일', icon: 'mail', w: 840, h: 520, x: 190, y: 60, data: { sel: null }, render: renderMail },
+  explorer:  { title: '파일 탐색기', icon: 'folder', w: 800, h: 490, x: 240, y: 80, data: { dir: 'docs' }, render: renderExplorer },
+  events:    { title: '이벤트 뷰어', icon: 'log', w: 880, h: 480, x: 160, y: 110, cls: 'light', data: { sel: null }, render: renderEvents },
+  doc:       { title: '메모장', icon: 'txt', w: 600, h: 470, x: 400, y: 50, render: renderDoc },
+  photo:     { title: '사진', icon: 'img', w: 700, h: 570, x: 320, y: 30, render: renderPhoto },
+  zip:       { title: '암호 입력', icon: 'zip', w: 430, h: 300, x: 425, y: 180, cls: 'light', dialog: true, render: renderZip },
+  zipdir:    { title: 'ledger_backup', icon: 'zip', w: 600, h: 260, x: 340, y: 160, render: renderZipDir },
+  csv:       { title: '송금내역_요약.csv - 메모장', icon: 'txt', w: 760, h: 400, x: 250, y: 120, render: renderCsv },
+  dialog:    { title: '', icon: 'info', w: 440, h: 200, x: 420, y: 240, dialog: true, render: renderDialog },
 };
 
 const wins = new Map();
@@ -990,17 +1006,17 @@ function openApp(app, opt = {}) {
   const y = clamp((opt.y ?? def.y) + (n % 5) * 22, 8, H - TASKBAR - hh - 8);
 
   const el = document.createElement('section');
-  el.className = 'win';
+  el.className = 'win ' + (def.cls || '');
   el.dataset.id = id;
   el.style.cssText = `left:${x}px;top:${y}px;width:${ww}px;height:${hh}px`;
-  const title = opt.title || def.title;
+  const title = opt.title ?? def.title;
   const ic = opt.icon || def.icon;
   el.innerHTML = `
     <header class="titlebar">
-      <span class="tb-ic">${icon(ic, 16)}</span>
+      ${def.dialog ? '' : `<span class="tb-ic">${icon(ic, 16)}</span>`}
       <span class="tb-title">${esc(title)}</span>
-      <button class="wbtn" data-a="win-min" aria-label="최소화">${SVG_MIN}</button>
-      <button class="wbtn close" data-a="win-close" aria-label="닫기">${SVG_X}</button>
+      ${def.dialog ? '' : `<button class="cap" data-a="win-min" aria-label="최소화">${SVG_MIN}</button><button class="cap" data-a="win-max" aria-label="최대화">${SVG_MAX}</button>`}
+      <button class="cap close" data-a="win-close" aria-label="닫기">${SVG_X}</button>
     </header>
     <div class="wbody"></div>`;
   $('#windows').appendChild(el);
@@ -1128,7 +1144,7 @@ function renderMessenger(w) {
     return `<button class="chat-item ${c.id === chat ? 'on' : ''}" data-a="chat" data-chat="${c.id}">
       ${chatAvatar(c)}
       <span class="ci-main">
-        <span class="ci-top"><b>${esc(c.title)}</b>${c.count ? `<i>${c.count}</i>` : ''}<time>${last ? last.time : ''}</time></span>
+        <span class="ci-top"><b>${esc(c.title)}</b>${c.count ? `<i>${c.count}</i>` : ''}<time>${last ? lastTime(last) : ''}</time></span>
         <span class="ci-prev">${prev}</span>
       </span>
       ${vm.unread[c.id] ? `<span class="badge">${vm.unread[c.id]}</span>` : ''}
@@ -1150,13 +1166,13 @@ function renderMessenger(w) {
     const cont = lastWho === m.who;
     lastWho = m.who;
     const body = m.deleted
-      ? '<svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M6 18 18 6" stroke="currentColor" stroke-width="2"/></svg> 삭제된 메시지입니다.'
+      ? '<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v6M12 16.5v.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg> 삭제된 메시지입니다.'
       : esc(m.text);
     html += `<div class="m ${me ? 'me' : ''} ${cont ? 'cont' : ''} ${m.deleted ? 'deleted' : ''} ${m.fresh && !w.min ? 'fresh' : ''}">
       ${me ? '' : (cont ? '<span class="av-gap"></span>' : avatar(p))}
       <div class="m-col">
-        ${!me && !cont && c.group ? `<span class="who">${esc(p.name)}</span>` : ''}
-        <div class="m-row"><div class="bub">${body}</div><span class="meta">${m.unread ? '<i>1</i>' : ''}${m.time}</span></div>
+        ${!me && !cont ? `<span class="who">${esc(p.name)}</span>` : ''}
+        <div class="m-row"><div class="bub">${body}</div><span class="meta">${m.unread ? '<i>1</i>' : ''}${ampm(m.time)}</span></div>
       </div>
     </div>`;
     if (!w.min) m.fresh = false;
@@ -1167,21 +1183,36 @@ function renderMessenger(w) {
     ? `<div class="m typing">${avatar(PEOPLE[vm.typing[chat].who])}<div class="m-col"><div class="m-row"><div class="bub"><span class="dots"><i></i><i></i><i></i></span></div></div></div></div>`
     : '';
 
-  const head = c.group
-    ? `<b>${esc(c.title)}</b><small>${c.count}명</small>`
-    : `<b>${esc(c.title)}</b><small>QA팀 · 페이로드</small>`;
+  const head = c.group ? `<b>${esc(c.title)}</b><small>${c.count}</small>` : `<b>${esc(c.title)}</b>`;
+  const rail = (d, on) => `<span class="${on ? 'on' : ''}"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">${d}</svg></span>`;
 
   return `<div class="msgr">
+    <nav class="lt-rail">
+      ${rail('<circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M4 20c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>', false)}
+      ${rail('<path d="M12 4C7 4 3 7.2 3 11.2c0 2.5 1.6 4.7 4 6L6.3 21l4.1-2.4c.5.1 1 .1 1.6.1 5 0 9-3.2 9-7.2S17 4 12 4z" fill="currentColor"/>', true)}
+      ${rail('<circle cx="6" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="18" cy="12" r="1.6" fill="currentColor"/>', false)}
+      <span class="me">${avatar(PEOPLE.seojin)}</span>
+    </nav>
     <aside class="chat-list">
-      <div class="chat-list-head"><b>채팅</b><span>한서진</span></div>
+      <div class="chat-list-head"><b>채팅</b><span><svg width="18" height="18" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></div>
       ${list}
     </aside>
     <section class="chat-pane">
       <header class="chat-head">${head}</header>
       <div class="chat-log">${rows}${typing}</div>
-      <footer class="chat-input"><span>재생 중인 기록입니다 · 메시지를 보낼 수 없습니다</span><button disabled>전송</button></footer>
+      <footer class="chat-input"><span>메시지 입력 (재생 중인 기록이라 보낼 수 없습니다)</span><button disabled>전송</button></footer>
     </section>
   </div>`;
+}
+
+// '23:41' → '오후 11:41'
+function ampm(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  return `${h < 12 ? '오전' : '오후'} ${h % 12 === 0 ? 12 : h % 12}:${pad2(m)}`;
+}
+
+function lastTime(m) {
+  return m.day === TODAY ? ampm(m.time) : m.day.replace(/ \S+요일$/, '');
 }
 
 /* 메일 */
@@ -1201,100 +1232,190 @@ function renderMail(w) {
     ? `<article class="mail-read">
         <h2>${esc(sel.subject)}</h2>
         <div class="mail-meta">
-          <span class="av" style="--c:#8ea3d6">${esc(sel.from.slice(0, 1))}</span>
+          <span class="av" style="--c:#5a6b85">${esc(sel.from.slice(0, 1))}</span>
           <div><b>${esc(sel.from)}</b> <span>&lt;${esc(sel.addr)}&gt;</span><small>받는 사람: ${esc(sel.to)} · ${esc(sel.full)}</small></div>
         </div>
         <div class="mail-body">${sel.body}</div>
       </article>`
-    : `<div class="empty">${icon('mail', 56)}<p>읽을 메일을 선택하세요</p></div>`;
+    : `<div class="empty">${icon('mail', 56)}<p>읽을 항목을 선택하세요</p></div>`;
 
   return `<div class="mailapp">
     <aside class="mail-side">
+      <div class="mail-new">새 메일</div>
       <div class="mail-acc">han.seojin@payroad.kr</div>
-      <div class="mail-folder on">받은편지함 <b>${unread || ''}</b></div>
-      <div class="mail-folder">보낸편지함</div>
-      <div class="mail-folder">임시보관함</div>
-      <div class="mail-folder">스팸</div>
+      <div class="mail-folder on">받은 편지함 <b>${unread || ''}</b></div>
+      <div class="mail-folder">임시 보관함</div>
+      <div class="mail-folder">보낸 편지함</div>
+      <div class="mail-folder">보관</div>
+      <div class="mail-folder">정크 메일</div>
+      <div class="mail-folder">지운 편지함</div>
     </aside>
-    <div class="mail-list"><div class="mail-list-head">받은편지함</div>${list}</div>
+    <div class="mail-list"><div class="mail-list-head">받은 편지함</div>${list}</div>
     <div class="mail-pane">${pane}</div>
   </div>`;
 }
 
 /* 파일 탐색기 */
+const PHOTO_SRC = {
+  house: 'photo/2009_제천_할머니집.jpg',
+  attic: 'photo/2009_비밀기지.jpg',
+  sea: 'photo/2021_강릉_워크숍.jpg',
+};
+
 function renderExplorer(w) {
   if (w.data.dir === 'usb' && !vm.usb) w.data.dir = 'docs';
   const dir = w.data.dir;
-  const side = FOLDERS.map(([id, label, ic]) =>
-    `<button class="side-item ${dir === id ? 'on' : ''}" data-a="dir" data-dir="${id}">${icon(ic, 18)}<span>${label}</span></button>`
-  ).join('') +
-    `<div class="side-sep"></div>
-     <button class="side-item ${dir === 'usb' ? 'on' : ''} ${vm.usb ? '' : 'off'}" data-a="dir" data-dir="usb" ${vm.usb ? '' : 'disabled'}>${icon('usb', 18)}<span>USB (E:)</span><small>${vm.usb ? '연결됨' : '없음'}</small></button>`;
+  const NAV = [['desktop', '바탕 화면', 'navDesk'], ['downloads', '다운로드', 'navDown'], ['docs', '문서', 'navDocs'], ['photos', '사진', 'navPics']];
+  const item = (id, label, ic, extra = '') =>
+    `<button class="side-item ${dir === id ? 'on' : ''}" data-a="dir" data-dir="${id}">${icon(ic, 16)}<span>${label}</span>${extra}</button>`;
+  const side = NAV.map(([id, label, ic]) => item(id, label, ic)).join('') +
+    '<div class="side-sep"></div>' + item('trash', '휴지통', 'trash') +
+    '<div class="side-sep"></div>' +
+    `<div class="side-item" style="pointer-events:none">${icon('pc', 16)}<span>내 PC</span></div>` +
+    `<button class="side-item ${dir === 'usb' ? 'on' : ''} ${vm.usb ? '' : 'off'}" data-a="dir" data-dir="usb" ${vm.usb ? '' : 'disabled'}>${icon('usb', 16)}<span>USB 드라이브 (E:)</span></button>`;
 
-  const label = dir === 'usb' ? 'USB (E:)' : FOLDERS.find(f => f[0] === dir)[1];
+  const label = dir === 'usb' ? 'USB 드라이브 (E:)' : dir === 'trash' ? '휴지통' : NAV.find(f => f[0] === dir)[1];
   let grid;
   let count = 0;
   if (dir === 'usb') {
-    grid = `<div class="exp-empty">${icon('usb', 48)}<p>이 드라이브의 내용은 COLD_BOOT 기록에 포함되지 않았습니다.</p><small>SanDisk Ultra · 32 GB</small></div>`;
+    grid = `<div class="exp-empty">${icon('usb', 48)}<p>이 드라이브의 내용은 COLD_BOOT 기록에 포함되지 않았습니다.</p><span>SanDisk Ultra · 32GB</span></div>`;
   } else {
     const files = vm.files[dir];
     count = files.length;
     grid = files.length
-      ? files.map((f, i) => `<button class="file ${w.data.selIdx === i ? 'sel' : ''} ${f.fresh ? 'fresh' : ''}" data-a="file" data-i="${i}" title="${esc(f.name)}">${icon(f.icon, 46)}<span>${esc(f.name)}</span></button>`).join('')
-      : `<div class="exp-empty"><p>이 폴더는 비어 있습니다.</p></div>`;
+      ? files.map((f, i) => {
+        const pic = f.kind === 'photo'
+          ? `<span class="thumb"><img src="${PHOTO_SRC[f.ref]}" alt="" onerror="this.parentNode.classList.add('noimg')">${icon('img', 48)}</span>`
+          : `<span class="thumb plain">${icon(f.icon, 48)}</span>`;
+        return `<button class="file ${w.data.selIdx === i ? 'sel' : ''} ${f.fresh ? 'fresh' : ''}" data-a="file" data-i="${i}" title="${esc(f.name)}">${pic}<span>${esc(f.name)}</span></button>`;
+      }).join('')
+      : '<div class="exp-empty"><p>이 폴더는 비어 있습니다.</p></div>';
     files.forEach(f => { f.fresh = false; });
   }
 
   const selFile = dir !== 'usb' && w.data.selIdx != null ? vm.files[dir][w.data.selIdx] : null;
+  const cmd = (d, t = '') => `<span><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">${d}</svg>${t}</span>`;
   return `<div class="exp">
-    <aside class="exp-side">${side}</aside>
-    <section class="exp-main">
-      <div class="exp-bar">
-        <span class="nav"><svg width="14" height="14" viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg><svg width="14" height="14" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2"/></svg></span>
-        <span class="crumb">이 PC <i>›</i> 한서진 <i>›</i> <b>${label}</b></span>
-        <span class="search">${label} 검색</span>
-      </div>
-      <div class="exp-grid">${grid}</div>
-      <footer class="exp-status"><span>항목 ${count}개</span><span class="exp-sel">${selFile ? `${esc(selFile.name)} · ${selFile.size} · 수정 ${selFile.mod}` : ''}</span></footer>
-    </section>
+    <div class="exp-cmd">
+      ${cmd('<path d="M12 5v14M5 12h14" stroke="#60cdff" stroke-width="2" stroke-linecap="round"/>', '새로 만들기')}
+      <span class="sep"></span>
+      ${cmd('<circle cx="6" cy="17" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="17" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 15 17 4M16 15 7 4" stroke="currentColor" stroke-width="1.6"/>')}
+      ${cmd('<rect x="8" y="8" width="11" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5 16V5a2 2 0 0 1 2-2h8" fill="none" stroke="currentColor" stroke-width="1.6"/>')}
+      ${cmd('<rect x="6" y="5" width="12" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="9" y="3" width="6" height="4" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/>')}
+      ${cmd('<path d="M5 19h4L19 9l-4-4L5 15z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>')}
+      ${cmd('<path d="M6 7h12l-1 13H7zM4 7h16M10 7V4h4v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>')}
+      <span class="sep"></span>
+      ${cmd('<path d="M7 4v16M4 17l3 3 3-3M17 20V4M14 7l3-3 3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>', '정렬')}
+      ${cmd('<rect x="4" y="4" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="4" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="4" y="13" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/><rect x="13" y="13" width="7" height="7" rx="1" fill="none" stroke="currentColor" stroke-width="1.6"/>', '보기')}
+    </div>
+    <div class="exp-bar">
+      <span class="nav">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="crumb">${icon(dir === 'usb' ? 'usb' : dir === 'trash' ? 'trash' : 'folder', 16)}<i>›</i>${dir === 'usb' || dir === 'trash' ? '' : '내 PC<i>›</i>'}<b>${label}</b></span>
+      <span class="search"><svg width="14" height="14" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>${label} 검색</span>
+    </div>
+    <div class="exp-main">
+      <aside class="exp-side">${side}</aside>
+      <section class="exp-content">
+        <div class="exp-grid">${grid}</div>
+        <footer class="exp-status"><span>항목 ${count}개</span><span class="exp-sel">${selFile ? `1개 항목 선택함  ${selFile.size}` : ''}</span></footer>
+      </section>
+    </div>
   </div>`;
 }
 
 /* 이벤트 뷰어 */
+const EV_ICON = {
+  info: '<svg width="14" height="14" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#1e6fd9"/><rect x="7.2" y="7" width="1.6" height="5" fill="#fff"/><circle cx="8" cy="4.8" r="1" fill="#fff"/></svg>',
+  warn: '<svg width="14" height="14" viewBox="0 0 16 16"><path d="M8 1.5 15 14H1z" fill="#f2b400" stroke="#b58700" stroke-width=".6"/><rect x="7.3" y="5.5" width="1.4" height="5" fill="#222"/><circle cx="8" cy="12" r=".8" fill="#222"/></svg>',
+  crit: '<svg width="14" height="14" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#d13438"/><path d="M5.2 5.2l5.6 5.6M10.8 5.2l-5.6 5.6" stroke="#fff" stroke-width="1.6"/></svg>',
+};
 const LV = { info: '정보', warn: '경고', crit: '위험' };
-function renderEvents() {
-  const rows = vm.logs.map(l => `
-    <tr class="lv-${l.lv} ${l.fresh ? 'fresh' : ''}">
-      <td><span class="lv"><i></i>${LV[l.lv]}</span></td>
-      <td class="mono">2026-11-20 ${l.time}</td>
+const EV_ID = { 'Kernel-Power': 107, 'Netlogon': 5783, 'Defender': 2001, 'COLD_BOOT': 1, 'USB': 2003, 'SQL Client': 3402, '파일 시스템': 4663, '보안': 4738, 'MDM': 404 };
+
+function renderEvents(w) {
+  const sel = w.data.sel ?? vm.logs.length - 1;
+  const rows = vm.logs.map((l, i) => `
+    <tr class="${l.fresh ? 'fresh' : ''} ${i === sel ? 'on' : ''}" data-a="ev" data-i="${i}">
+      <td><span class="lv">${EV_ICON[l.lv]}${LV[l.lv]}</span></td>
+      <td>2026-11-20 ${ampm(l.time.slice(0, 5))}:${l.time.slice(6)}</td>
       <td>${esc(l.src)}</td>
-      <td>${esc(l.text)}</td>
+      <td>${EV_ID[l.src] || 0}</td>
+      <td>없음</td>
     </tr>`).join('');
   vm.logs.forEach(l => { l.fresh = false; });
-  return `<div class="ev">
-    <div class="ev-head"><b>시스템 로그 <i>›</i> 전체</b><span>이벤트 ${vm.logs.length}개</span><span class="live"><i></i>실시간</span></div>
-    <div class="ev-scroll"><table>
-      <thead><tr><th style="width:84px">수준</th><th style="width:170px">날짜와 시간</th><th style="width:110px">원본</th><th>내용</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table></div>
+  const s = vm.logs[sel] || vm.logs[vm.logs.length - 1];
+  const tree = (cls, d, t) => `<div class="${cls}">${d}${t}</div>`;
+  const fold = '<svg width="14" height="14" viewBox="0 0 48 48">' + ICONS.folder + '</svg>';
+  const logi = '<svg width="14" height="14" viewBox="0 0 48 48">' + ICONS.log + '</svg>';
+  return `<div class="mmc">
+    <nav class="mmc-menu"><span>파일(F)</span><span>동작(A)</span><span>보기(V)</span><span>도움말(H)</span></nav>
+    <div class="mmc-tool">
+      <i><svg width="14" height="14" viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" fill="none" stroke="currentColor" stroke-width="2.4"/></svg></i>
+      <i><svg width="14" height="14" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4"/></svg></i>
+      <i><svg width="14" height="14" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"/></svg></i>
+      <i><svg width="14" height="14" viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.2"/></svg></i>
+    </div>
+    <div class="mmc-body">
+      <aside class="mmc-tree">
+        ${tree('', logi, '이벤트 뷰어 (로컬)')}
+        ${tree('l1', fold, '사용자 지정 보기')}
+        ${tree('l1', fold, 'Windows 로그')}
+        ${tree('l2', logi, '응용 프로그램')}
+        ${tree('l2', logi, '보안')}
+        ${tree('l2', logi, 'Setup')}
+        ${tree('l2 on', logi, '시스템')}
+        ${tree('l2', logi, 'Forwarded Events')}
+        ${tree('l1', fold, '응용 프로그램 및 서비스 로그')}
+        ${tree('l1', fold, '구독')}
+      </aside>
+      <section class="mmc-center">
+        <div class="mmc-caption">시스템 <span>이벤트 수: ${vm.logs.length}</span></div>
+        <div class="ev-scroll"><table>
+          <colgroup><col style="width:84px"><col style="width:190px"><col style="width:110px"><col style="width:80px"><col></colgroup>
+          <thead><tr><th>수준</th><th>날짜 및 시간</th><th>원본</th><th>이벤트 ID</th><th>작업 범주</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table></div>
+        <div class="mmc-detail">
+          <b>이벤트 ${EV_ID[s.src] || 0}, ${esc(s.src)}</b>
+          <p>${esc(s.text)}</p>
+          <dl><dt>로그 이름:</dt><dd>시스템</dd><dt>원본:</dt><dd>${esc(s.src)}</dd><dt>기록된 날짜:</dt><dd>2026-11-20 ${ampm(s.time.slice(0, 5))}:${s.time.slice(6)}</dd><dt>컴퓨터:</dt><dd>DEV-HANSJ-03</dd></dl>
+        </div>
+      </section>
+    </div>
   </div>`;
 }
 
 /* 메모장 */
-function renderDoc(w) {
-  const d = DOCS[w.data.doc];
-  const lines = d.text.split('\n').length;
+function notepad(text) {
+  const lines = text.split('\n').length;
   return `<div class="np">
-    <nav class="np-menu"><span>파일</span><span>편집</span><span>서식</span><span>보기</span><span>도움말</span></nav>
-    <pre class="np-text">${esc(d.text)}</pre>
-    <footer class="np-status"><span>줄 ${lines}, 열 1</span><span>100%</span><span>CRLF</span><span>UTF-8</span></footer>
+    <nav class="np-menu"><span>파일</span><span>편집</span><span>보기</span></nav>
+    <pre class="np-text">${esc(text)}</pre>
+    <footer class="np-status"><span>줄 ${lines}, 열 1</span><span>100%</span><span>Windows (CRLF)</span><span>UTF-8</span></footer>
   </div>`;
+}
+
+function renderDoc(w) {
+  return notepad(DOCS[w.data.doc].text);
 }
 
 /* 사진 */
 function renderPhoto(w) {
   const p = PHOTOS[w.data.photo];
+  const b = d => `<i><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">${d}</svg></i>`;
   return `<div class="pv">
+    <div class="pv-bar">
+      <b>${esc(w.data.name)}</b>
+      ${b('<circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M11 8v6M8 11h6M16 16l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>')}
+      ${b('<circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11h6M16 16l4 4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>')}
+      ${b('<path d="M20 12a8 8 0 1 1-2.4-5.7M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="1.6"/>')}
+      ${b('<path d="M6 7h12l-1 13H7zM4 7h16M10 7V4h4v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>')}
+      ${b('<circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 11v5M12 8v.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>')}
+    </div>
     <div class="pv-stage"><div class="pv-frame">${p.svg}</div></div>
     <footer class="pv-info">
       <div><b>${esc(w.data.name)}</b><span>${esc(p.date)}</span></div>
@@ -1305,71 +1426,75 @@ function renderPhoto(w) {
 
 /* 압축 파일 */
 function renderZip(w) {
-  if (!vm.unlocked) {
-    return `<div class="zip-lock ${w.data.err ? 'shake' : ''}">
-      <div class="zl-icon">${icon('lock', 60)}</div>
-      <h3>암호가 필요합니다</h3>
-      <p><b>ledger_backup.zip</b>은(는) AES-256으로 암호화되어 있습니다.</p>
-      <p class="zl-hint"><small>암호 힌트</small>제천 할머니 집 와이파이</p>
-      <form class="zl-form" data-form="zip">
-        <input name="pw" type="text" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="암호 입력" aria-label="압축 파일 암호">
-        <button type="submit">풀기</button>
-      </form>
-      <p class="zl-err" ${w.data.err ? '' : 'hidden'}>암호가 올바르지 않습니다.</p>
-    </div>`;
-  }
+  return `<form class="sz ${w.data.err ? 'shake' : ''}" data-form="zip">
+    <div class="sz-row">${icon('lock', 32)}<p>다음 압축 파일의 암호를 입력하십시오.<br><b>ledger_backup.zip</b></p></div>
+    <p class="hint">압축 파일 주석: 제천 할머니 집 와이파이</p>
+    <label>암호(P):
+      <input name="pw" type="password" autocomplete="off" spellcheck="false" autocapitalize="off" aria-label="압축 파일 암호">
+    </label>
+    <label class="chk"><input type="checkbox" data-pwshow> 암호 표시(S)</label>
+    ${w.data.err ? '<p class="sz-err">암호가 잘못되었습니다. 다시 입력하십시오.</p>' : ''}
+    <div class="sz-btns"><button type="submit" class="w-btn def">확인</button><button type="button" class="w-btn" data-a="win-close">취소</button></div>
+  </form>`;
+}
+
+function renderZipDir() {
   return `<div class="zip-open">
-    <div class="zip-head">${icon('zip', 30)}<div><b>ledger_backup.zip</b><small>압축 해제됨 · 항목 2개 · 3.4 MB</small></div></div>
-    <div class="zip-list">
-      <button class="zip-row" data-a="zip-csv">${icon('csv', 34)}<span><b>송금내역_요약.csv</b><small>CSV 파일 · 18 KB</small></span><i>열기</i></button>
-      <button class="zip-row" data-a="zip-letter">${icon('txt', 34)}<span><b>도윤에게.txt</b><small>텍스트 문서 · 1 KB</small></span><i>열기</i></button>
-    </div>
+    <div class="zip-head">${icon('zip', 28)}<div>ledger_backup.zip<small>압축 해제됨 · 항목 2개</small></div></div>
+    <div class="zip-cols"><span>이름</span><span>유형</span><span>크기</span></div>
+    <button class="zip-row" data-a="zip-csv"><span>${icon('csv', 20)}송금내역_요약.csv</span><small>CSV 파일</small><small>18KB</small></button>
+    <button class="zip-row" data-a="zip-letter"><span>${icon('txt', 20)}도윤에게.txt</span><small>텍스트 문서</small><small>1KB</small></button>
   </div>`;
 }
 
 /* 송금 내역 */
 function renderCsv() {
-  const fmt = n => n.toLocaleString('ko-KR');
+  const rows = LEDGER.map(([d, amt, memo]) => `${d},${amt},에버그린 홀딩스,윤서영,${memo},moon.tk`);
   const total = LEDGER.reduce((s, r) => s + r[1], 0);
-  const rows = LEDGER.map(([d, amt, memo], i) => `
-    <tr><td class="rn">${i + 2}</td><td class="mono">${d}</td><td class="num">${fmt(amt)}</td><td>에버그린 홀딩스</td><td>윤서영</td><td>${memo}</td><td class="mono hl">moon.tk</td></tr>`).join('');
-  return `<div class="csv">
-    <div class="csv-bar"><span class="cell-ref">G2</span><span class="fx">fx</span><span>moon.tk</span></div>
-    <div class="csv-scroll"><table>
-      <thead><tr><th></th><th>A · 일자</th><th>B · 금액(원)</th><th>C · 수취인</th><th>D · 법인 대표</th><th>E · 적요</th><th>F · 승인자</th></tr></thead>
-      <tbody>${rows}
-        <tr class="sum"><td class="rn">9</td><td>합계</td><td class="num">${fmt(total)}</td><td></td><td></td><td></td><td></td></tr>
-      </tbody>
-    </table></div>
-    <footer class="csv-foot"># 출처: ledger_prod.withdrawals (고객 예치금 계정) · 추출 2026-11-20 22:29 · han.seojin</footer>
-  </div>`;
+  return notepad([
+    '일자,금액,수취인,법인대표,적요,승인자',
+    ...rows,
+    `합계,${total},,,,`,
+    '',
+    '# 출처: ledger_prod.withdrawals (고객 예치금 계정)',
+    '# 추출: 2026-11-20 22:29 han.seojin',
+  ].join('\n'));
 }
 
 function renderDialog(w) {
-  return `<div class="dlg">${icon('info', 34)}<p>${esc(w.data.text)}</p><button data-a="win-close">확인</button></div>`;
+  return `<div class="dlg">
+    <div class="dlg-body">${icon('info', 32)}<p>${esc(w.data.text)}</p></div>
+    <div class="dlg-btns"><button data-a="win-close">확인</button></div>
+  </div>`;
 }
 
 /* 파일 열기 */
 function openFile(f) {
   if (!f) return;
-  if (f.kind === 'doc') openApp('doc', { id: 'doc:' + f.ref, title: f.name + ' — 메모장', data: { doc: f.ref, clue: DOCS[f.ref].clue } });
-  else if (f.kind === 'photo') openApp('photo', { id: 'photo:' + f.ref, title: f.name + ' — 사진', data: { photo: f.ref, name: f.name, clue: PHOTOS[f.ref].clue } });
-  else if (f.kind === 'zip') openApp('zip', { data: { clue: 'zip' } });
-  else openApp('dialog', { id: 'dlg:' + f.name, title: f.name, data: { text: '이 파일은 미리 볼 수 없습니다. 재생 기록에 PDF 뷰어가 포함되어 있지 않습니다.' } });
+  if (f.kind === 'doc') openApp('doc', { id: 'doc:' + f.ref, title: f.name + ' - 메모장', data: { doc: f.ref, clue: DOCS[f.ref].clue } });
+  else if (f.kind === 'photo') openApp('photo', { id: 'photo:' + f.ref, title: f.name + ' - 사진', data: { photo: f.ref, name: f.name, clue: PHOTOS[f.ref].clue } });
+  else if (f.kind === 'zip') {
+    if (vm.unlocked) openApp('zipdir', { data: { clue: 'zip' } });
+    else openApp('zip', { data: { clue: 'zip' } });
+  } else {
+    openApp('dialog', { id: 'dlg:' + f.name, title: f.name, data: { text: '이 파일을 열 수 있는 앱이 없습니다. 재생 기록에는 PDF 뷰어가 포함되어 있지 않습니다.' } });
+  }
 }
 
 /* 바탕화면 아이콘 */
 const DESKTOP_APPS = [
+  { key: 'trash', label: '휴지통', icon: 'trash' },
   { key: 'messenger', label: '링크톡', icon: 'chat' },
   { key: 'mail', label: '메일', icon: 'mail' },
   { key: 'explorer', label: '파일 탐색기', icon: 'folder' },
   { key: 'events', label: '이벤트 뷰어', icon: 'log' },
-  { key: 'trash', label: '휴지통', icon: 'trash' },
 ];
+
 let deskSel = null;
 
 function launch(key) {
-  if (key === 'trash') openApp('explorer', { data: { dir: 'trash', selIdx: null } });
+  if (key === 'photos') openApp('explorer', { data: { dir: 'photos', selIdx: null } });
+  else if (key === 'trash') openApp('explorer', { data: { dir: 'trash', selIdx: null } });
   else if (key === 'explorer') openApp('explorer', { data: { selIdx: null } });
   else openApp(key);
 }
@@ -1381,10 +1506,10 @@ function renderIcons() {
   const badges = { messenger: unreadMsgs(), mail: unreadMails() };
   const apps = DESKTOP_APPS.map(a => `
     <button class="dicon ${deskSel === a.key ? 'sel' : ''}" data-desk="${a.key}" role="listitem">
-      ${icon(a.icon, 46)}<span>${a.label}</span>${badges[a.key] ? `<b class="badge">${badges[a.key]}</b>` : ''}
+      ${icon(a.icon, 44)}<span>${a.label}</span>${badges[a.key] ? `<b class="badge">${badges[a.key]}</b>` : ''}
     </button>`).join('');
   const files = vm.files.desktop.map((f, i) => `
-    <button class="dicon ${deskSel === 'f' + i ? 'sel' : ''}" data-desk="f${i}" role="listitem">${icon(f.icon, 46)}<span>${esc(f.name)}</span></button>`).join('');
+    <button class="dicon ${deskSel === 'f' + i ? 'sel' : ''}" data-desk="f${i}" role="listitem">${icon(f.icon, 44)}<span>${esc(f.name)}</span></button>`).join('');
   $('#icons').innerHTML = apps + files;
 }
 
@@ -1395,20 +1520,16 @@ function openDesk(key) {
 
 /* 작업 표시줄 */
 function renderTaskbar() {
-  const pinned = ['messenger', 'mail', 'explorer', 'events'];
+  const pinned = ['explorer', 'mail', 'messenger'];
   const badges = { messenger: unreadMsgs(), mail: unreadMails() };
   const open = [...wins.values()];
   let html = pinned.map(app => {
     const ws = open.filter(w => w.app === app);
-    const on = ws.length > 0;
     const focus = ws.some(w => w.id === focusedId);
-    return `<button class="tb-app ${on ? 'open' : ''} ${focus ? 'focus' : ''}" data-tb="${app}" title="${APPS[app].title}">${icon(APPS[app].icon, 26)}${badges[app] ? `<b class="badge">${badges[app]}</b>` : ''}</button>`;
+    return `<button class="tb-app ${ws.length ? 'open' : ''} ${focus ? 'focus' : ''}" data-tb="${app}" title="${APPS[app].title}">${icon(APPS[app].icon, 24)}${badges[app] ? `<b class="badge">${badges[app]}</b>` : ''}</button>`;
   }).join('');
-  const extra = open.filter(w => !pinned.includes(w.app));
-  if (extra.length) {
-    html += '<span class="tb-div"></span>' + extra.map(w =>
-      `<button class="tb-app open ${w.id === focusedId ? 'focus' : ''}" data-tbw="${esc(w.id)}" title="${esc(w.title)}">${icon(w.icon, 24)}</button>`).join('');
-  }
+  html += open.filter(w => !pinned.includes(w.app)).map(w =>
+    `<button class="tb-app open ${w.id === focusedId ? 'focus' : ''}" data-tbw="${esc(w.id)}" title="${esc(w.title)}">${icon(w.icon, 24)}</button>`).join('');
   $('#tb-apps').innerHTML = html;
 }
 
@@ -1418,21 +1539,42 @@ function refreshBadges() {
 }
 
 /* 시작 메뉴 */
+let powerOpen = false;
+
 function openStart() {
   const el = $('#startmenu');
+  const recent = [
+    ['docs', 0, '업무일지_11월.txt', '오늘 오후 9:40'],
+    ['desktop', 0, 'COLD_BOOT_메모.txt', '11월 2일'],
+    ['photos', 0, '2009_제천_할머니집.jpg', '11월 14일'],
+    ['downloads', 0, '바로콜_영수증_1103.pdf', '11월 3일'],
+  ];
   el.innerHTML = `
-    <div class="sm-user"><span class="av" style="--c:#7aa2ff">서</span><div><b>한서진</b><small>DEV-HANSJ-03 · payroad.kr</small></div></div>
-    <div class="sm-label">고정됨</div>
-    <div class="sm-grid">
-      ${DESKTOP_APPS.map(a => `<button class="sm-app" data-a="sm-app" data-key="${a.key}">${icon(a.icon, 34)}<span>${a.label}</span></button>`).join('')}
-      <button class="sm-app" data-a="sm-notes">${icon('notes', 34)}<span>수사 노트</span></button>
+    <div class="sm-inner">
+      <div class="sm-search"><svg width="16" height="16" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m15.5 15.5 5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>앱, 설정, 문서 검색</div>
+      <div class="sm-sec">고정됨 <span>모든 앱 ›</span></div>
+      <div class="sm-grid">
+        ${DESKTOP_APPS.map(a => `<button class="sm-app" data-a="sm-app" data-key="${a.key}">${icon(a.icon, 32)}<span>${a.label}</span></button>`).join('')}
+        <button class="sm-app" data-a="sm-app" data-key="photos">${icon('navPics', 32)}<span>사진</span></button>
+      </div>
+      <div class="sm-sec">추천 <span>자세히 ›</span></div>
+      <div class="sm-rec">
+        ${recent.map(([dir, i, name, when]) => {
+          const f = vm.files[dir][i];
+          return `<button data-a="sm-file" data-dir="${dir}" data-i="${i}">${icon(f.icon, 28)}<span>${esc(name)}<small>${when}</small></span></button>`;
+        }).join('')}
+      </div>
     </div>
     <div class="sm-foot">
-      <span>COLD_BOOT 0.3.1 · 재생 중 ${clockText(vm.t)}</span>
-      <button class="sm-rewind" data-a="rewind">
-        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M4 4v5h5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        22:00으로 되감기
+      <div class="sm-user"><span class="av" style="--c:#5a72a8">서</span>한서진</div>
+      <button class="sm-power ${powerOpen ? 'on' : ''}" data-a="power" aria-label="전원">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path d="M12 3v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M6.3 6.3a8 8 0 1 0 11.4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
       </button>
+      ${powerOpen ? `<div class="sm-pmenu">
+        <button disabled>절전</button>
+        <button disabled>시스템 종료</button>
+        <button data-a="rewind">다시 시작</button>
+      </div>` : ''}
     </div>`;
   el.hidden = false;
   $('#btn-start').classList.add('on');
@@ -1441,24 +1583,41 @@ function openStart() {
 function closeStart() {
   $('#startmenu').hidden = true;
   $('#btn-start').classList.remove('on');
+  powerOpen = false;
 }
 
 /* 알림 */
-function toast({ ic, app, title, text, host = false, onClick }) {
+/* Windows 알림 (가상 PC 쪽) */
+function toast({ ic, app, title, text, onClick }) {
   const box = $('#toasts');
   const el = document.createElement('button');
-  el.className = 'toast' + (host ? ' host' : '');
-  el.innerHTML = `<span class="t-ic">${icon(ic, host ? 22 : 30)}</span><span class="t-main"><small>${esc(app)}</small><b>${esc(title)}</b>${text ? `<span>${esc(text)}</span>` : ''}</span>`;
+  el.className = 'toast';
+  el.innerHTML = `<span class="t-head">${icon(ic, 16)}<span>${esc(app)}</span><em>···</em></span><span class="t-body"><b>${esc(title)}</b>${text ? `<span>${esc(text)}</span>` : ''}</span>`;
   const dismiss = () => {
     el.classList.add('out');
-    setTimeout(() => el.remove(), 260);
+    setTimeout(() => el.remove(), 220);
   };
   el.addEventListener('click', () => { if (onClick) onClick(); dismiss(); });
   box.appendChild(el);
-  while (box.children.length > 4) box.firstElementChild.remove();
-  setTimeout(dismiss, host ? 3600 : 5200);
+  while (box.children.length > 3) box.firstElementChild.remove();
+  setTimeout(dismiss, 5600);
 }
 
+/* Mac 알림 (호스트 쪽: 수사 노트) */
+function htoast({ ic = 'notes', app = '수사 노트', title, text, onClick }) {
+  const box = $('#htoasts');
+  const el = document.createElement('div');
+  el.className = 'htoast';
+  el.innerHTML = `${icon(ic, 30)}<div><small><span>${esc(app)}</span><span>지금</span></small><b>${esc(title)}</b>${text ? `<span>${esc(text)}</span>` : ''}</div>`;
+  const dismiss = () => {
+    el.classList.add('out');
+    setTimeout(() => el.remove(), 250);
+  };
+  el.addEventListener('click', () => { if (onClick) onClick(); dismiss(); });
+  box.appendChild(el);
+  while (box.children.length > 3) box.firstElementChild.remove();
+  setTimeout(dismiss, 3800);
+}
 
 /* ---------------------------------------------------------
    8. 관찰 → 단서 기록
@@ -1491,7 +1650,7 @@ function gain(id) {
   newClues.add(id);
   persist();
   const added = knownWords().size - before;
-  toast({ ic: 'notes', app: 'HOST · 수사 노트에 기록', title: CLUES[id].title, text: added ? `보고서 단어 +${added}` : '', host: true, onClick: openNotes });
+  htoast({ title: CLUES[id].title, text: added ? `수사 노트에 기록 · 보고서 단어 +${added}` : '수사 노트에 기록', onClick: openNotes });
   Sound.sfx('clue');
   updateNotesCount();
   const btn = $('#btn-notes');
@@ -1570,8 +1729,14 @@ function fire(e) {
   refreshBadges();
 }
 
+function winClock(t) {
+  const total = 22 * 60 + Math.floor(t);
+  const h = Math.floor(total / 60) % 24;
+  return `${h < 12 ? '오전' : '오후'} ${h % 12 === 0 ? 12 : h % 12}:${pad2(total % 60)}`;
+}
+
 function updateClock() {
-  $('#clock-time').textContent = clockText(vm.t);
+  $('#clock-time').textContent = winClock(vm.t);
   $('#tl-fill').style.width = (vm.t / LOOP_LEN * 100) + '%';
   stage.classList.toggle('tense', vm.t >= tm('23:55'));
   stage.classList.toggle('late', vm.t >= tm('23:30'));
@@ -1641,14 +1806,14 @@ function startWipe() {
   vm.wiping = true;
   vm.wipeN = 0;
   closeStart();
+  $('#toasts').innerHTML = '';
   const el = $('#wipe');
-  el.innerHTML = `<div class="wipe-panel">
-    <div class="wipe-top">${SVG_WARN}<div><small>페이로드 MDM · 원격 명령</small><h2>이 기기를 초기화하는 중입니다</h2></div></div>
-    <p>승인 계정 <b>kang.jh</b> · 대상 DEV-HANSJ-03 · 이 작업은 되돌릴 수 없습니다.</p>
-    <div class="wipe-bar"><i id="wipe-fill"></i></div>
-    <div class="wipe-row"><span id="wipe-pct">0%</span><span>컴퓨터를 끄지 마세요</span></div>
-    <ol id="wipe-files"></ol>
-  </div>`;
+  el.innerHTML = `<div class="reset">
+    <div class="win-spin"><i></i><i></i><i></i><i></i><i></i></div>
+    <h2>이 PC를 초기화하는 중 <span id="wipe-pct">0</span>%</h2>
+    <p>원격 관리자가 요청한 작업입니다. PC를 끄지 마세요.</p>
+  </div>
+  <small id="wipe-files"></small>`;
   el.hidden = false;
   Sound.sfx('alarm');
 }
@@ -1656,19 +1821,19 @@ function startWipe() {
 function updateWipe() {
   if (!vm.wiping) return;
   const p = clamp((vm.t - WIPE_AT) / (LOOP_LEN - WIPE_AT), 0, 1);
-  const fill = $('#wipe-fill');
-  if (!fill) return;
-  fill.style.width = (p * 100) + '%';
-  $('#wipe-pct').textContent = Math.floor(p * 100) + '%';
-  const list = $('#wipe-files');
+  const pct = $('#wipe-pct');
+  if (!pct) return;
+  pct.textContent = Math.floor(p * 100);
+  let changed = false;
   while (vm.wipeN < Math.floor(p * 64)) {
-    const li = document.createElement('li');
-    const path = WIPE_PATHS[vm.wipeN % WIPE_PATHS.length];
-    li.innerHTML = `<span>삭제</span>${esc(path)}`;
-    list.appendChild(li);
-    Sound.sfx('hdd');
-    while (list.children.length > 7) list.firstElementChild.remove();
     vm.wipeN += 1;
+    changed = true;
+    Sound.sfx('hdd');
+  }
+  if (changed) {
+    const lines = [];
+    for (let i = Math.max(0, vm.wipeN - 4); i < vm.wipeN; i += 1) lines.push('del  ' + WIPE_PATHS[i % WIPE_PATHS.length]);
+    $('#wipe-files').textContent = lines.join('\n');
   }
 }
 
@@ -1713,6 +1878,8 @@ function boot() {
   $('#toasts').innerHTML = '';
   $('#veil').hidden = true;
   $('#twist').hidden = true;
+  $('#lock').hidden = true;
+  $('#htoasts').innerHTML = '';
   stage.classList.remove('tense', 'late', 'glitch');
   $('#loop-tag').textContent = 'LOOP ' + pad2(save.loop);
   updateNotesCount();
@@ -1726,15 +1893,17 @@ function boot() {
   else showBootLog();
 }
 
+const MAC_MENU = (app) => `<div class="mac-menubar"><b>${app}</b><span>파일</span><span>편집</span><span>보기</span><span>윈도우</span><span class="r">11월 25일 (화) 오전 4:12</span></div>`;
+
 function showIntro() {
   const el = $('#boot');
   el.className = 'intro-mode';
-  el.innerHTML = `<div class="intro">
-    <div class="intro-card">
-      <div class="intro-app"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span><span>받은편지함 — doyun.han@mail.kr</span></div>
+  el.innerHTML = `${MAC_MENU('메일')}
+    <div class="mac-win intro">
+      <div class="mac-bar"><span class="mac-dots"><i></i><i></i><i></i></span><span>받은 편지함 — doyun.han@mail.kr</span></div>
       <div class="intro-head">
-        <span class="av" style="--c:#7aa2ff">서</span>
-        <div><b>한서진</b> <span>&lt;seojin.han.dev@mail.kr&gt;</span><small>받는 사람: 한도윤 · 2026-11-23 (월) 22:00 · 예약 발송</small></div>
+        <span class="av" style="--c:#5a72a8">서</span>
+        <div><b>한서진</b> <span>&lt;seojin.han.dev@mail.kr&gt;</span><small>받는 사람: 한도윤 · 2026년 11월 23일 (월) 오후 10:00 · 예약 발송</small></div>
       </div>
       <h1>[자동 발송] 도윤아</h1>
       <div class="intro-body">
@@ -1743,11 +1912,10 @@ function showIntro() {
         <p>그날 밤에 무슨 일이 있었는지, 네가 대신 봐 줘.</p>
         <p class="sign">— 누나</p>
       </div>
-      <div class="intro-att">${icon('zip', 34)}<div><b>COLD_BOOT_20261120.vmimg</b><small>38.2 GB · 가상 머신 이미지</small></div></div>
-      <button class="intro-go" data-a="intro-go">이미지 열기</button>
+      <div class="intro-att">${icon('zip', 34)}<div><b>COLD_BOOT_20261120.vmimg</b><small>38.2GB · 가상 머신 이미지</small></div></div>
+      <button class="mac-btn" data-a="intro-go">첨부 파일 열기</button>
     </div>
-    <p class="intro-note">11월 25일 새벽. 누나와 연락이 끊긴 지 닷새째.</p>
-  </div>`;
+    <p class="intro-note">11월 25일 새벽. 누나와 연락이 끊긴 지 닷새째.</p>`;
 }
 
 let bootTimer = null;
@@ -1756,99 +1924,131 @@ function showBootLog() {
   const el = $('#boot');
   el.className = 'boot-mode';
   const n = Object.keys(save.clues).length;
+  const d = Object.keys(save.deds).length;
+  const tip = BOOT_TIPS[Math.min(save.loop - 1, BOOT_TIPS.length - 1)];
   const lines = [
-    ['', 'COLD_BOOT hypervisor 0.3.1 · personal build · han.seojin'],
+    ['cmd', 'coldboot replay ~/Downloads/COLD_BOOT_20261120.vmimg'],
+    ['', 'COLD_BOOT 0.3.1 (personal build, han.seojin)'],
     ['dim', '"재생은 바꿀 수 없어. 하지만 보는 건 몇 번이고 할 수 있어."'],
     ['', ''],
-    ['ok', '이미지 확인 ········ COLD_BOOT_20261120.vmimg (38.2 GB)'],
-    ['ok', '무결성 검사 ········ SHA-256 일치'],
-    ['ok', '스냅샷 복원 ········ 2026-11-20 (금) 22:00:00 KST'],
-    ['ok', `기록 적재 ·········· 메신저 ${COUNT.msg} · 메일 ${COUNT.mail} · 시스템 로그 ${COUNT.log} · 파일 변경 1`],
-    ['ok', '재생 모드 ·········· 읽기 전용 · 기록된 사건은 바뀌지 않음'],
-    ['warn', '기록 종료 지점 ······ 23:58:12 · 원격 초기화 감지'],
-    ['ok', `호스트 노트 연결 ···· 단서 ${n}개 · 추론 ${Object.keys(save.deds).length}개 · 보고서 ${save.stage}/3 보존됨`],
+    ['ok', '이미지 확인       COLD_BOOT_20261120.vmimg  38.2GB  SHA-256 일치'],
+    ['ok', '스냅샷 복원       2026-11-20 (금) 22:00:00 KST'],
+    ['ok', `기록 적재         메신저 ${COUNT.msg} · 메일 ${COUNT.mail} · 시스템 로그 ${COUNT.log} · 파일 변경 1`],
+    ['ok', '재생 모드         읽기 전용 (기록된 사건은 바뀌지 않음)'],
+    ['warn', '기록 종료 지점    23:58:12  원격 초기화 감지'],
+    ['ok', `수사 노트         단서 ${n} · 추론 ${d} · 보고서 ${save.stage}/3`],
     ['', ''],
-    ['', `> 리플레이 ${save.loop}회차 준비 완료`],
+    ['big', `loop ${pad2(save.loop)} 준비 완료`],
+    ['dim', `# ${tip}`],
+    ['prompt', ''],
   ];
-  const tip = BOOT_TIPS[Math.min(save.loop - 1, BOOT_TIPS.length - 1)];
 
-  el.innerHTML = `<div class="boot-wrap">
-    <div class="boot-log" id="boot-log"></div>
-    <div class="boot-side">
-      <small>REPLAY</small>
-      <div class="boot-num">LOOP <b>${pad2(save.loop)}</b></div>
-      <div class="boot-bar"><i id="boot-fill"></i></div>
-      <div class="boot-meta"><span>22:00</span><span>23:58</span></div>
-      <button class="boot-start" data-a="boot-start" id="boot-start" hidden>
-        <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l12-7.5z" fill="currentColor"/></svg>
-        재생 시작
-      </button>
-      <p class="boot-tip" id="boot-tip" hidden><small>TIP</small>${esc(tip)}</p>
-    </div>
-  </div>`;
+  el.innerHTML = `${MAC_MENU('터미널')}
+    <div class="mac-win term">
+      <div class="mac-bar"><span class="mac-dots"><i></i><i></i><i></i></span><span>doyun — coldboot — 96×24</span></div>
+      <div class="term-body" id="boot-log"></div>
+      <div class="term-actions" id="boot-start-row" hidden>Enter 키를 눌러도 됩니다 <button class="mac-btn" data-a="boot-start" id="boot-start">재생 시작</button></div>
+    </div>`;
+
+  const PROMPT = '<span class="p">doyun@MacBook-Air ~ %</span> ';
+  const line = ([cls, txt]) => {
+    const div = document.createElement('div');
+    div.className = 'bl ' + cls;
+    if (cls === 'cmd') div.innerHTML = PROMPT + esc(txt);
+    else if (cls === 'prompt') { div.innerHTML = PROMPT; div.classList.add('cursor'); }
+    else if (cls === 'ok') div.innerHTML = '<span class="ok">[ok]  </span>' + esc(txt);
+    else if (cls === 'warn') div.innerHTML = '<span class="warn">[warn]</span>' + esc(txt);
+    else div.innerHTML = esc(txt) || '&nbsp;';
+    return div;
+  };
 
   const log = $('#boot-log');
   let i = 0;
   const step = () => {
     if (i >= lines.length) { finishBoot(); return; }
-    const [cls, txt] = lines[i];
-    const div = document.createElement('div');
-    div.className = 'bl ' + cls;
-    div.innerHTML = cls === 'ok' ? `<span class="st">[ ok ]</span>${esc(txt)}` : cls === 'warn' ? `<span class="st">[warn]</span>${esc(txt)}` : (esc(txt) || '&nbsp;');
-    log.appendChild(div);
+    log.appendChild(line(lines[i]));
     i += 1;
-    $('#boot-fill').style.width = (i / lines.length * 100) + '%';
-    bootTimer = setTimeout(step, txt ? 90 + Math.random() * 160 : 60);
+    bootTimer = setTimeout(step, i === 1 ? 500 : lines[i - 1][1] ? 70 + Math.random() * 130 : 50);
   };
   el.dataset.done = '';
   el.skip = () => {
     clearTimeout(bootTimer);
-    while (i < lines.length) {
-      const [cls, txt] = lines[i];
-      const div = document.createElement('div');
-      div.className = 'bl ' + cls;
-      div.innerHTML = cls === 'ok' ? `<span class="st">[ ok ]</span>${esc(txt)}` : cls === 'warn' ? `<span class="st">[warn]</span>${esc(txt)}` : (esc(txt) || '&nbsp;');
-      log.appendChild(div);
-      i += 1;
-    }
+    while (i < lines.length) { log.appendChild(line(lines[i])); i += 1; }
     finishBoot();
   };
-  bootTimer = setTimeout(step, 300);
+  bootTimer = setTimeout(step, 350);
 }
 
 function finishBoot() {
   const el = $('#boot');
   el.dataset.done = '1';
   Sound.sfx('beep');
-  $('#boot-fill').style.width = '100%';
-  $('#boot-start').hidden = false;
-  $('#boot-tip').hidden = false;
+  $('#boot-start-row').hidden = false;
   $('#boot-start').focus();
 }
 
+// 터미널 → Windows 잠금 화면
 function startLoop() {
   const el = $('#boot');
   if (running || el.hidden || el.classList.contains('leaving')) return;
   el.classList.add('leaving');
+  showLock();
   setTimeout(() => {
     el.hidden = true;
     el.classList.remove('leaving');
+  }, 400);
+}
+
+function showLock() {
+  const el = $('#lock');
+  el.className = '';
+  el.dataset.step = 'lock';
+  const tip = BOOT_TIPS[Math.min(save.loop - 1, BOOT_TIPS.length - 1)];
+  el.innerHTML = `
+    <div class="lock-bg"></div>
+    <div class="lock-clock"><b>10:00</b><span>11월 20일 금요일</span></div>
+    <div class="lock-hint"><b>클릭하거나 아무 키나 누르면 로그인합니다</b><em>LOOP ${pad2(save.loop)} · ${esc(tip)}</em></div>
+    <div class="lock-tray">
+      <svg width="18" height="18" viewBox="0 0 24 24"><path d="M2.5 9a14 14 0 0 1 19 0M5.8 12.4a9.3 9.3 0 0 1 12.4 0M9.1 15.8a4.6 4.6 0 0 1 5.8 0" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/><circle cx="12" cy="19.3" r="1.4" fill="#fff"/></svg>
+      <svg width="20" height="18" viewBox="0 0 28 24"><rect x="2" y="6" width="21" height="12" rx="2.5" fill="none" stroke="#fff" stroke-width="1.6"/><rect x="4.5" y="8.5" width="11" height="7" rx="1" fill="#fff"/><path d="M25 10v4" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </div>
+    <div class="signin">
+      <div class="si-av">서</div>
+      <div class="si-name">한서진</div>
+      <div class="si-pin"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+      <div class="si-msg" id="si-msg"></div>
+    </div>`;
+  el.hidden = false;
+}
+
+// 잠금 화면 → 로그인 → 바탕 화면, 재생 시작
+function signIn() {
+  const el = $('#lock');
+  if (el.hidden || el.dataset.step !== 'lock') return;
+  el.dataset.step = 'signin';
+  el.classList.add('in');
+  Sound.sfx('pick');
+  setTimeout(() => {
+    $('#si-msg').innerHTML = '<div class="win-spin" style="margin:0 auto 8px"><i></i><i></i><i></i><i></i><i></i></div>환영합니다';
+  }, 1600);
+  setTimeout(() => {
+    el.hidden = true;
     running = true;
     lastFrame = performance.now();
     Sound.sfx('start');
-    toast({ ic: 'info', app: 'COLD_BOOT', title: '재생을 시작합니다', text: `LOOP ${pad2(save.loop)} · 자정까지 120분` });
-  }, 380);
+    htoast({ ic: 'term', app: 'COLD_BOOT', title: `LOOP ${pad2(save.loop)} 재생 시작`, text: '자정까지 120분' });
+  }, 3000);
 }
-
 
 /* ---------------------------------------------------------
    11. 수사 노트와 보고서
    --------------------------------------------------------- */
 
 function openNotes() {
-  if (transitioning || !$('#boot').hidden) return;
+  if (transitioning || !$('#boot').hidden || !$('#lock').hidden) return;
   notesOpen = true;
   paused = true;
+  $('#htoasts').innerHTML = '';
   closeStart();
   renderNotes();
   $('#notes').classList.add('open');
@@ -2093,8 +2293,9 @@ function renderNotes() {
   const hint = HINTS.find(([k, id]) => (k === 'c' ? !save.clues[id] : !save.deds[id]));
   $('#notes').classList.toggle('wide', notesTab === 'board');
   $('#notes').innerHTML = `
+    <div class="nb-mac"><span class="mac-dots"><i></i><i></i><i></i></span><span>수사 노트 — 도윤의 MacBook</span></div>
     <header class="nb-head">
-      <div><small>HOST · 도윤의 노트북</small><h2>수사 노트</h2></div>
+      <div><small>HOST · 가상 PC 바깥</small><h2>수사 노트</h2></div>
       <button class="nb-close" data-a="notes-close" aria-label="수사 노트 닫기">${SVG_X}</button>
     </header>
     <div class="nb-stats">
@@ -2288,6 +2489,10 @@ document.addEventListener('click', e => {
 
   switch (a) {
     case 'win-min': minimizeWin(w); break;
+    case 'win-max': w.el.classList.toggle('max'); break;
+    case 'ev': w.data.sel = +t.dataset.i; renderWin(w); break;
+    case 'power': powerOpen = !powerOpen; openStart(); break;
+    case 'sm-file': closeStart(); openFile(vm.files[t.dataset.dir][+t.dataset.i]); break;
     case 'win-close': closeWin(w); break;
     case 'chat': w.data.chat = t.dataset.chat; renderWin(w); refreshBadges(); break;
     case 'mail': w.data.sel = t.dataset.id; renderWin(w); refreshBadges(); break;
@@ -2298,7 +2503,7 @@ document.addEventListener('click', e => {
       w.data.selIdx = i;
       $$('.file', w.body).forEach(f => f.classList.toggle('sel', f === t));
       const f = vm.files[w.data.dir][i];
-      $('.exp-sel', w.body).textContent = `${f.name} · ${f.size} · 수정 ${f.mod}`;
+      $('.exp-sel', w.body).textContent = `1개 항목 선택함  ${f.size}`;
       break;
     }
     case 'zip-csv': openApp('csv', { data: { clue: 'ledger' } }); break;
@@ -2409,10 +2614,9 @@ document.addEventListener('submit', e => {
     const pw = new FormData(form).get('pw').trim().toLowerCase();
     if (pw === 'jecheon0807') {
       vm.unlocked = true;
-      w.data.err = false;
       Sound.sfx('unlock');
-      renderWin(w);
-      toast({ ic: 'zip', app: '압축 해제', title: 'ledger_backup.zip', text: '항목 2개를 풀었습니다' });
+      closeWin(w);
+      openApp('zipdir', { data: { clue: 'zip' } });
     } else {
       w.data.err = true;
       Sound.sfx('error');
@@ -2431,8 +2635,13 @@ document.addEventListener('input', e => {
   }
 });
 
-// 보고서 빈칸 고르기
+// 보고서 빈칸 고르기, 암호 표시
 document.addEventListener('change', e => {
+  if (e.target.matches('[data-pwshow]')) {
+    const input = $('input[name="pw"]', e.target.closest('form'));
+    if (input) input.type = e.target.checked ? 'text' : 'password';
+    return;
+  }
   const sel = e.target.closest('select[data-blank]');
   if (!sel) return;
   save.answers[sel.dataset.blank] = sel.value;
@@ -2447,7 +2656,7 @@ document.addEventListener('pointerdown', e => {
   const box = e.target.closest('.win');
   if (box) focusWin(wins.get(box.dataset.id));
   const bar = e.target.closest('.titlebar');
-  if (bar && box && !e.target.closest('button')) {
+  if (bar && box && !e.target.closest('button') && !box.classList.contains('max')) {
     const w = wins.get(box.dataset.id);
     drag = { w, sx: e.clientX, sy: e.clientY, x: w.el.offsetLeft, y: w.el.offsetTop };
     w.el.classList.add('dragging');
@@ -2475,6 +2684,7 @@ document.addEventListener('keydown', e => {
     if (notesOpen) closeNotes();
     closeStart();
   }
+  if (!$('#lock').hidden && !e.target.closest('input, textarea')) { signIn(); return; }
   const bootEl = $('#boot');
   if (!bootEl.hidden && (e.key === 'Enter' || e.key === ' ') && !e.target.closest('input, textarea')) {
     if (bootEl.classList.contains('intro-mode')) { save.intro = true; persist(); showBootLog(); e.preventDefault(); }
@@ -2498,6 +2708,17 @@ function renderSoundBtn() {
   b.setAttribute('aria-pressed', String(save.sound));
   b.title = save.sound ? '소리 끄기' : '소리 켜기';
 }
+
+// 잠금 화면: 클릭하면 로그인
+$('#lock').addEventListener('click', signIn);
+
+// 제목 표시줄 더블클릭: 최대화
+document.addEventListener('dblclick', e => {
+  const bar = e.target.closest('.titlebar');
+  if (!bar || e.target.closest('button')) return;
+  const w = winOf(bar);
+  if (w && !APPS[w.app].dialog) w.el.classList.toggle('max');
+});
 
 // 브라우저는 사용자가 한 번 누른 뒤에야 소리를 허락함
 document.addEventListener('pointerdown', () => Sound.init());
