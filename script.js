@@ -105,13 +105,13 @@ const CLUES = {
   mdmmail:   { t: '23:55', title: '원격 초기화 승인', src: '메일 · MDM', w: ['kang.jh', '23:55'],
                body: '23:55, MDM 알림: 이 PC의 원격 초기화를 승인한 계정은 kang.jh (강준혁).' },
   mdmlog:    { t: '23:55', title: '명령을 보낸 기기', src: '이벤트 뷰어', w: ['QA-HARIN-01', 'kang.jh', '23:55'],
-               body: '23:55, WIPE 명령의 발신 기기는 QA-HARIN-01 (10.0.4.17).' },
+               body: '23:55, kang.jh 계정으로 온 WIPE 명령. 발신 기기는 QA-HARIN-01 (10.0.4.17).' },
   ledger:    { title: '송금 내역', src: 'ledger_backup.zip', w: ['에버그린 홀딩스', 'moon.tk', '윤서영'],
                body: '고객 예치금 4억 2천만 원이 일곱 번에 걸쳐 에버그린 홀딩스로 나갔다. 승인자는 모두 moon.tk. 에버그린의 법인 대표는 윤서영.' },
   letter:    { title: '도윤에게', src: 'ledger_backup.zip', w: [],
                body: '"사람들이 날 찾는 곳엔 없을 거야. 어디로 간다고 말하든 믿지 마. 사다리 치우면 아무도 못 올라오는 데, 거기 있을게."' },
   photo:     { title: '우리 비밀기지', src: '사진 폴더', w: ['제천 할머니 집 다락'],
-               body: '2009년 여름. 제천 할머니 집 창고 위 다락. 사다리를 치우면 아무도 못 올라오는 곳.' },
+               body: '2009년 여름, 제천 할머니 집 다락. 창고 위에 있어서 사다리를 치우면 아무도 못 올라오는 곳.' },
 };
 
 // 보고서 빈칸에 넣을 수 있는 단어와 종류
@@ -129,19 +129,19 @@ const TYPE_LABEL = { person: '인물', account: '계정', device: '기기', comp
 
 // 연결 보드: 두 카드를 고르고 연결고리 단어(key 중 하나)를 고르면 생기는 추론 (추론 카드끼리도 이을 수 있음)
 const DEDUCTIONS = [
-  { id: 'd_device', key: ['QA-HARIN-01'], pairs: [['mdmlog', 'assets']], w: [],
+  { id: 'd_device', q: '초기화 명령을 보낸 기기의 주인은 누구인가?', key: ['QA-HARIN-01'], pairs: [['mdmlog', 'assets']], w: [],
     title: '명령은 하린의 PC에서', body: '초기화 명령을 보낸 QA-HARIN-01은 오하린의 업무용 PC다.' },
-  { id: 'd_alibi', key: ['kang.jh', '강준혁'], pairs: [['admin', 'alibi'], ['mdmmail', 'alibi'], ['mdmlog', 'alibi']], w: [],
+  { id: 'd_alibi', q: '계정 주인은 그 시각 어디에 있었나?', key: ['kang.jh', '강준혁'], pairs: [['admin', 'alibi'], ['mdmmail', 'alibi'], ['mdmlog', 'alibi']], w: [],
     title: '계정 주인은 자리에 없었다', body: 'kang.jh의 주인 강준혁은 그 시각 부산행 KTX 안. 버튼을 누른 건 계정을 빌린 사람이다.' },
-  { id: 'd_leak', key: ['오하린', '22:18'], pairs: [['ask', 'perm']], w: [],
+  { id: 'd_leak', q: '(보너스) 서진의 의심은 누구를 거쳐 대표에게 갔나?', key: ['오하린', '22:18'], pairs: [['ask', 'perm']], w: [],
     title: '누가 대표에게 알렸나', body: '22:18, 서진이 하린에게만 예치금 이야기를 꺼냈다. 42분 뒤 대표가 서진의 권한을 회수했다. 그 사이에 말을 옮긴 사람이 있다.' },
-  { id: 'd_wife', key: ['윤서영'], pairs: [['wedding', 'ledger'], ['wedding', 'diary']], w: ['강준혁의 아내'],
+  { id: 'd_wife', q: '돈을 받은 회사의 대표는 누구인가?', key: ['윤서영'], pairs: [['wedding', 'ledger'], ['wedding', 'diary']], w: ['강준혁의 아내'],
     title: '에버그린의 대표', body: '송금을 받은 에버그린 홀딩스의 대표 윤서영은 강준혁의 아내다.' },
-  { id: 'd_plan', key: ['강준혁', '09:12', '부산'], pairs: [['d_wife', 'd_alibi'], ['d_wife', 'admin']], w: [],
+  { id: 'd_plan', q: '그 알리바이는 우연이었나? (추론 카드끼리 이어 보세요)', key: ['강준혁', '09:12', '부산'], pairs: [['d_wife', 'd_alibi'], ['d_wife', 'admin']], w: [],
     title: '준비된 알리바이', body: '강준혁은 사건 당일 아침 계정을 하린에게 넘기고 처가가 있는 부산으로 떠났다. 돈은 아내의 회사로 갔다. 그는 피해자가 아니다.' },
-  { id: 'd_decoy', key: ['강릉역'], pairs: [['taxi', 'letter'], ['decoy', 'letter'], ['taxi', 'secret'], ['decoy', 'secret']], w: [],
+  { id: 'd_decoy', q: '서진이 말한 행선지는 진짜인가?', key: ['강릉역'], pairs: [['taxi', 'letter'], ['decoy', 'letter'], ['taxi', 'secret'], ['decoy', 'secret']], w: [],
     title: '강릉은 미끼', body: '"어디로 간다고 말하든 믿지 마." 강릉행 택시는 남들 보라고 잡은 것이다.' },
-  { id: 'd_base', key: ['제천 할머니 집 다락'], pairs: [['letter', 'photo'], ['secret', 'photo']], w: [],
+  { id: 'd_base', q: '"어릴 때 숨던 데"는 어디인가?', key: ['제천 할머니 집 다락'], pairs: [['letter', 'photo'], ['secret', 'photo']], w: [],
     title: '사다리 치우면 못 올라오는 곳', body: '편지 속 "어릴 때 숨던 데"는 제천 할머니 집 창고 위 다락, 우리 비밀기지다.' },
 ];
 
@@ -191,7 +191,7 @@ const HINTS = [
   ['c', 'memo', '바탕화면의 COLD_BOOT_메모.txt부터 열어 보세요. 이 PC가 무엇인지 알 수 있습니다.'],
   ['c', 'assets', '받은편지함의 지난 공지도 읽어 보세요. 기기 이름마다 주인이 적혀 있습니다.'],
   ['c', 'mdmlog', '23:55에 이벤트 뷰어가 열려 있어야 볼 수 있는 기록이 있습니다. 23:58이 지나면 손쓸 수 없습니다.'],
-  ['d', 'd_device', '"초기화 명령을 보낸 기기"와 "기기 이름의 주인이 적힌 자료"를 이어 보세요. 연결고리는 두 카드에 모두 나오는 기기 이름입니다.'],
+  ['d', 'd_device', '연결 보드의 첫 질문: "명령을 보낸 기기"와 "기기 이름의 주인이 적힌 자료"를 이어 보세요. 연결고리는 두 카드에 모두 나오는 기기 이름입니다.'],
   ['c', 'alibi', '개발팀 단톡방은 22시 50분쯤 한 번 더 울립니다.'],
   ['d', 'd_alibi', '관리자 계정의 주인은 그 시각 어디에 있었나요? 계정에 관한 단서와 그의 행방을 이어 보세요.'],
   ['c', 'zip', '22:31쯤 다운로드 폴더에 새 파일이 생깁니다.'],
@@ -402,7 +402,9 @@ const EVENTS = [
   { t: '23:20', type: 'msg', chat: 'harin', who: 'harin', text: '너 오늘 진짜 이상해. 내가 너네 집 갈까?' },
   { t: '23:22', type: 'msg', chat: 'harin', who: 'seojin', text: '아니 괜찮아. 혹시 나한테 무슨 일 생기면 도윤이한테 연락 좀 해줘' },
   { t: '23:23', type: 'msg', chat: 'harin', who: 'harin', text: '무슨 소리야 무섭게 ㅠㅠ' },
+  { t: '23:39', type: 'slow', text: '누군가 입력하고 있다' },
   { t: '23:39', type: 'typing', chat: 'harin', who: 'harin', until: '23:41' },
+  { t: '23:54', type: 'slow', text: '자정이 다가온다' },
   { t: '23:41', type: 'msg', chat: 'harin', who: 'harin', key: 'slip', clue: 'deleted', text: '대표님, 서진이 눈치챘어요. USB에 백업까지 떠놨어요. 자정 전에 제가 준혁 팀장님 계정으로 원격 초기화 걸게요.' },
   { t: '23:43', type: 'delete', chat: 'harin', key: 'slip' },
   { t: '23:44', type: 'msg', chat: 'harin', who: 'seojin', text: '하린아?' },
@@ -1801,6 +1803,12 @@ function fire(e) {
     case 'wipe':
       startWipe();
       break;
+    case 'slow':
+      if (speed > 1) {
+        setSpeed(1);
+        htoast({ ic: 'term', app: 'COLD_BOOT', title: '1배속으로 늦췄습니다', text: e.text });
+      }
+      break;
   }
   refreshBadges();
 }
@@ -2157,7 +2165,7 @@ function clueCard(id) {
     <time>${c.t || '자료'}</time>
     <div>
       <h4>${esc(c.title)}</h4>
-      <p>${esc(c.body)}</p>
+      <p>${kw(esc(c.body))}</p>
       <small>${esc(c.src)} · LOOP ${pad2(save.clues[id])}에서 발견</small>
     </div>
   </article>`;
@@ -2180,7 +2188,7 @@ function boardCard(id) {
     <i class="pin"></i>
     <span class="bc-top">${ded ? '추론' : esc(c.t || '자료')}</span>
     <b>${esc(c.title)}</b>
-    <span class="bc-body">${esc(c.body)}</span>
+    <span class="bc-body">${kw(esc(c.body))}</span>
   </button>`;
 }
 
@@ -2207,12 +2215,12 @@ function renderBoard() {
         ${wordBank('link-word')}
         <button class="link-cancel" data-a="link-cancel">취소</button>
       </div>`
-    : `<p class="board-lead">카드 두 장을 고른 뒤, 둘을 잇는 <b>연결고리 단어</b>를 고르세요. 맞으면 <b>추론 카드</b>가 생깁니다. 추론 카드끼리도 이을 수 있습니다.</p>${msg}`;
+    : `<p class="board-lead">아래 <b>질문</b>에 답할 수 있는 카드 두 장을 고른 뒤, 둘을 잇는 <b>연결고리 단어</b>를 고르세요. 맞으면 질문이 <b>추론 카드</b>로 바뀝니다.</p>${msg}`;
   return `<div class="board" id="board">
     <svg class="thread" id="thread" aria-hidden="true"></svg>
     <div class="board-top">${top}</div>
     <h5>추론 <i>${deds.length}/${DEDUCTIONS.length}</i></h5>
-    <div class="bgrid">${deds.length ? deds.map(boardCard).join('') : '<p class="nb-empty small">아직 없습니다.</p>'}</div>
+    <div class="bgrid">${DEDUCTIONS.map(d => (save.deds[d.id] ? boardCard(d.id) : `<div class="qcard"><span>?</span><b>${esc(d.q)}</b></div>`)).join('')}</div>
     <h5>단서 <i>${clues.length}</i></h5>
     <div class="bgrid">${clues.length ? clues.map(boardCard).join('') : '<p class="nb-empty small">📌 핀을 꽂은 단서가 이곳에 붙습니다.</p>'}</div>
   </div>`;
@@ -2317,8 +2325,12 @@ function renderReport() {
       return `<span class="proof ${ok ? 'ok' : ''}">${ok ? '✓ ' + esc(DEDUCTIONS.find(x => x.id === d).title) : '? 증명 필요'}</span>`;
     }).join('');
     const m = stageMsg[i];
+    const need = [...new Set(st.lines.flat().filter(x => typeof x === 'object').map(x => x.a))];
+    const known = knownWords();
+    const have = need.filter(x => known.has(x)).length;
+    const meter = done ? '' : `<span class="meter ${have === need.length ? 'full' : ''}" title="이 단계에 필요한 단어를 몇 개 모았는지">필요한 단어 ${need.length}개 중 <b>${have}</b>개 모음</span>`;
     return `<section class="stage ${done ? 'done' : ''}">
-      <header><span>${i + 1}단계</span><b>${esc(st.title)}</b>${done ? '<em class="seal">확인됨</em>' : ''}</header>
+      <header><span>${i + 1}단계</span><b>${esc(st.title)}</b>${done ? '<em class="seal">확인됨</em>' : meter}</header>
       ${lines}
       <div class="proofs"><small>근거</small>${proof}</div>
       ${done
@@ -2332,7 +2344,7 @@ function renderReport() {
     ? `<div class="bank-dock">
         <p>${activeBlank ? `<b>${TYPE_LABEL[activeType]}</b> 칸에 넣을 단어를 고르세요` : '빈칸을 누른 뒤, 아래에서 단어를 고르세요'}
           ${activeBlank ? '<button class="chip-clear" data-a="chip-clear">칸 비우기</button>' : ''}</p>
-        ${wordBank('chip', activeBlank ? activeType : null)}
+        ${activeBlank ? wordBank('chip', activeType) : ''}
       </div>`
     : '';
 
@@ -2629,7 +2641,8 @@ function drawRain(dt) {
 // 글 속 단어 모으기
 document.addEventListener('click', e => {
   const k = e.target.closest('.kw');
-  if (k) collectWord(k.dataset.w, e);
+  if (!k) return;
+  collectWord(k.dataset.w, e);  // 단어를 줍고, 원래 클릭(카드 고르기 등)도 그대로 진행
 }, true);
 
 // 버튼 클릭 (data-a)
@@ -2747,11 +2760,14 @@ $('#btn-start').addEventListener('click', () => {
 $('#btn-notes').addEventListener('click', () => {
   if (notesOpen) closeNotes(); else openNotes();
 });
+function setSpeed(v) {
+  speed = v;
+  $$('#speed button').forEach(x => x.classList.toggle('on', +x.dataset.speed === v));
+}
+
 $('#speed').addEventListener('click', e => {
   const b = e.target.closest('[data-speed]');
-  if (!b) return;
-  speed = +b.dataset.speed;
-  $$('#speed button').forEach(x => x.classList.toggle('on', x === b));
+  if (b) setSpeed(+b.dataset.speed);
 });
 $('#veil').addEventListener('click', closeNotes);
 

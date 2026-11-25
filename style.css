@@ -3692,3 +3692,47 @@ code {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* 아직 못 푼 추론: 질문 카드 */
+.qcard {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  min-height: 92px;
+  padding: 12px 12px 10px;
+  border-radius: 3px;
+  border: 1.5px dashed rgba(255, 220, 160, 0.35);
+  background: rgba(0, 0, 0, 0.18);
+  color: #e9d8b8;
+}
+
+.qcard span {
+  font: 900 18px var(--sans);
+  color: #f5b800;
+  line-height: 1;
+}
+
+.qcard b {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+/* 보고서 단계별 단어 진행 */
+.meter {
+  margin-left: auto;
+  padding: 2px 9px;
+  border-radius: 20px;
+  background: rgba(0, 0, 0, 0.25);
+  font-size: 11.5px;
+  color: #a8987a;
+  white-space: nowrap;
+}
+
+.meter b { color: #ffd99c; }
+.meter.full { color: #a8f0c8; background: rgba(69, 212, 154, 0.1); }
+.meter.full b { color: #a8f0c8; }
+
+/* 수사 노트(어두운 종이) 위의 단어 */
+#notes .kw:hover { background: rgba(245, 184, 0, 0.25); }
+#notes .kw.got { text-decoration-color: rgba(245, 184, 0, 0.6); }
