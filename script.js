@@ -908,7 +908,7 @@ const Sound = (() => {
    --------------------------------------------------------- */
 
 function defaultSave() {
-  return { loop: 1, clues: {}, words: {}, deds: {}, stage: 0, intro: false, solved: false, reports: 0, misses: 0, memo: '', answers: {}, sound: true };
+  return { loop: 1, clues: {}, words: {}, deds: {}, seen: {}, stage: 0, intro: false, solved: false, reports: 0, misses: 0, memo: '', answers: {}, sound: true };
 }
 
 function loadSave() {
@@ -1486,6 +1486,7 @@ function renderDialog(w) {
 /* 파일 열기 */
 function openFile(f) {
   if (!f) return;
+  if (f.ref === 'gift') { save.seen = { ...(save.seen || {}), gift: true }; persist(); }
   if (f.kind === 'doc') openApp('doc', { id: 'doc:' + f.ref, title: f.name + ' - 메모장', data: { doc: f.ref, clue: DOCS[f.ref].clue } });
   else if (f.kind === 'photo') openApp('photo', { id: 'photo:' + f.ref, title: f.name + ' - 사진', data: { photo: f.ref, name: f.name, clue: PHOTOS[f.ref].clue } });
   else if (f.kind === 'zip') {
@@ -2490,14 +2491,83 @@ function resetAll() {
    12. 엔딩
    --------------------------------------------------------- */
 
+let endBeats = [];
+let endIdx = 0;
+
 function showEnding() {
   running = false;
   if (notesOpen) closeNotes();
   save.solved = true;
   persist();
   Sound.sfx('ending');
+
   const n = Object.keys(save.clues).length;
   const total = Object.keys(CLUES).length;
+  const misses = save.misses || 0;
+
+  // 찾아낸 것에 따라 더해지는 장면
+  const extra = {
+    secret: save.clues.secret,
+    leak: save.deds.d_leak,
+    gift: save.seen && save.seen.gift,
+    slip: save.clues.deleted,
+  };
+  const found = Object.values(extra).filter(Boolean).length;
+  const all = Object.keys(extra).length;
+
+  // 장면을 하나씩 보여 준다: 재회 → 그날 밤의 진실 → 그 후
+  const B = (tag, line, sub = '', bonus = false) => ({ tag, line, sub, bonus });
+  endBeats = [
+    // 재회
+    B('재회', '창고 문을 열자 먼지 냄새가 먼저 났다.',
+      '11월 25일 새벽 5시 41분, 충북 제천. 도윤은 밤새 차를 몰아 할머니 집에 닿았다. 창고 안의 사다리는 바닥에 눕혀져 있었다. 누군가 위에서 치운 것이다.'),
+    B('재회', '"늦었네."',
+      '이름을 부르자 한참 뒤에 다락 판자가 밀려났다. 서진은 손전등을 끄며 웃었다. 닷새 동안 제대로 씻지도 못한 얼굴이었지만, 손에는 SanDisk USB를 꼭 쥐고 있었다.'),
+    B('재회', '"강릉 간다고 했잖아. 하린이한테."',
+      '"그러니까 여기 있지." 하린의 메시지를 본 순간, 서진은 누구에게 무엇을 말할지부터 다시 정했다고 했다. 강릉행 택시는 남들 보라고 잡은 것이었다.'),
+    extra.secret && B('재회', '"그날 비밀기지 메시지, 나 안 읽었었어. 미안."',
+      '23시 50분에 온 그 메시지에는 아직도 읽지 않음 1이 떠 있었다. 서진이 고개를 저었다. "지금 읽었잖아."', true),
+
+    // 그날 밤의 진실
+    B('그날 밤의 진실', '사라진 4억 2천만 원',
+      '11월 14일, 서진은 고객 예치금 합계가 실제 잔액보다 4억 2천만 원 모자란다는 걸 발견했다. 돈은 일곱 번에 걸쳐 "에버그린 홀딩스"라는 회사로 빠져나갔고, 모든 송금은 대표 문태경의 계정 moon.tk가 승인했다.'),
+    B('그날 밤의 진실', '22:18, 처음 털어놓은 사람',
+      '서진은 가장 친한 동료 오하린에게 "숫자가 좀 이상하다"고 처음 말했다. 42분 뒤인 23시, 대표는 서진의 예치금 데이터베이스 권한을 회수했다. 그 사이에 말을 옮긴 사람은 한 명뿐이었다.'),
+    extra.leak && B('그날 밤의 진실', '"하린이한테 처음 말한 게 나야. 그게 제일 아파."',
+      '그 이야기를 꺼내며 서진은 한참 말이 없었다. 의심을 처음 나눈 사람이 의심을 전한 사람이었다.', true),
+    B('그날 밤의 진실', '23:41, 2분 만에 지워진 메시지',
+      '하린은 대표에게 보낼 메시지를 서진에게 잘못 보냈다. "자정 전에 제가 준혁 팀장님 계정으로 원격 초기화 걸게요." 메시지는 2분 만에 삭제됐지만, 서진은 이미 읽은 뒤였다.'),
+    B('그날 밤의 진실', '23:55, 지워지는 PC',
+      '초기화 명령은 개발팀장 강준혁의 관리자 계정 kang.jh로 들어왔다. 하지만 명령을 보낸 기기는 하린의 업무용 PC, QA-HARIN-01이었다. 버튼을 누른 건 하린이었다.'),
+    B('그날 밤의 진실', '그리고, 강준혁',
+      '그는 그날 아침 9시 12분 관리자 계정을 하린에게 "임시로" 넘기고, 처가가 있는 부산으로 떠났다. 기록에는 자기 계정만 남고 자신은 그 자리에 없도록. 돈을 받은 에버그린 홀딩스의 대표 윤서영은 그의 아내였다.'),
+
+    // 그 후
+    B('그 후', '보고서와 USB',
+      '그날 오후, 도윤의 보고서와 서진의 USB 원본은 금융감독원과 경찰에 함께 넘겨졌다. 재생 속 메신저와 메일, 이벤트 로그가 그대로 증거가 됐다.'),
+    extra.slip && B('그 후', '맨 앞에 붙은 한 장',
+      '제출 자료 맨 앞에는 23시 41분, 단 2분 동안만 존재했던 메시지의 캡처가 붙어 있었다. 그 한 장이 하린의 진술을 이끌어 냈다.', true),
+    B('그 후', '문태경과 강준혁',
+      '두 사람은 업무상 횡령 혐의로 입건됐다. 강준혁은 끝까지 "계정을 공유했을 뿐"이라고 주장했지만, 오래된 청첩장 한 장이 그 말을 무너뜨렸다.'),
+    B('그 후', '오하린',
+      '하린은 첫 조사에서 모든 것을 인정했다. 대표가 시킨 일이었고, 거절하면 자기가 다음이 될 것 같았다고 했다. 진술서 마지막 줄에는 "서진이에게 미안하다"고 적혀 있었다.'),
+    extra.gift && B('그 후', '전하지 못한 원두 봉투',
+      '서진의 외투 주머니에는 강릉 카페 원두 봉투가 비죽 나와 있었다. 12월 3일, 하린의 생일에 주려던 것이었다. 서진은 그걸 버리지도, 건네지도 못했다.', true),
+    B('그 후', '페이로드의 고객들',
+      '에버그린 홀딩스의 계좌가 동결되면서, 빠져나간 예치금은 대부분 고객에게 돌아갔다.'),
+    B('끝', 'COLD_BOOT 이미지는 그 뒤로 다시 켜지지 않았다.',
+      '재생은 바꿀 수 없었다. 하지만 누군가 끝까지 봐 주었다.'),
+  ].filter(Boolean);
+  endIdx = 0;
+
+  const title =
+    save.loop === 1 && misses <= 3 ? '한 번에 꿰뚫은 사람' :
+    found === all ? '아무것도 놓치지 않은 사람' :
+    misses >= 15 ? '모든 곳에 핀을 꽂은 사람' :
+    save.loop >= 5 ? '몇 번이고 다시 본 사람' :
+    save.loop <= 2 ? '날카로운 눈' :
+    '끝까지 지켜본 사람';
+
   const el = $('#ending');
   el.innerHTML = `
     <div class="end-sky"><div class="end-sun"></div><svg class="end-hills" viewBox="0 0 1280 260" preserveAspectRatio="none" aria-hidden="true">
@@ -2505,22 +2575,28 @@ function showEnding() {
       <path d="M0 190C160 150 300 170 460 160 640 130 800 180 980 150 1120 130 1220 160 1280 150V260H0Z" fill="#1b1a36"/>
       <path d="M880 170h120v-46l-60-34-60 34z" fill="#121128"/><rect x="926" y="128" width="16" height="12" fill="#f2b45a" opacity=".9"/>
     </svg></div>
-    <div class="end-inner">
-      <small>11월 25일 · 오전 5시 41분 · 충북 제천</small>
+
+    <div class="end-story" id="end-story">
+      <div class="end-beat" id="end-beat"></div>
+      <p class="end-next"><span id="end-count"></span> · 클릭하거나 Enter를 누르면 계속</p>
+      <button class="end-skip" data-a="end-skip">건너뛰기</button>
+    </div>
+
+    <div class="end-summary" id="end-summary" hidden>
+      <small>11월 25일 · 충북 제천</small>
       <h1>사다리는 치워져 있었다.</h1>
-      <div class="end-text">
-        <p>창고 문을 열자 먼지 냄새가 먼저 났다. 위를 보고 이름을 부르자, 한참 뒤에 다락 판자가 밀려났다.</p>
-        <p>"늦었네." 서진은 손전등을 끄며 말했다. 손에는 SanDisk USB가 들려 있었다.</p>
-        <p>"강릉 간다고 했잖아. 하린이한테." 도윤이 말하자 서진이 웃었다. "그러니까 여기 있지."</p>
-        <p>그날 오후, 도윤의 보고서와 USB 원본은 금융감독원과 경찰에 함께 넘겨졌다. 초기화 명령을 보낸 기기는 QA-HARIN-01, 송금을 승인한 계정은 moon.tk, 돈을 받은 에버그린 홀딩스의 대표는 강준혁의 아내 윤서영이었다. 부산행 KTX 표는 알리바이가 아니라 미리 짜 둔 각본이었다.</p>
-        <p>COLD_BOOT 이미지는 그 뒤로 다시 켜지지 않았다.</p>
-      </div>
+      <ul class="end-case">
+        <li><span>실행</span>오하린 · QA-HARIN-01</li>
+        <li><span>승인</span>문태경 · moon.tk</li>
+        <li><span>수취</span>에버그린 홀딩스 · 윤서영 (강준혁의 아내)</li>
+      </ul>
+      <p class="end-title"><small>칭호</small><b>${title}</b><span>본 장면 ${found}/${all}${found < all ? ' · 놓친 순간이 더 있습니다' : ''}</span></p>
       <dl class="end-stats">
         <div><dt>리플레이</dt><dd>${save.loop}회</dd></div>
-        <div><dt>찾은 단서</dt><dd>${n}/${total}</dd></div>
+        <div><dt>단서</dt><dd>${n}/${total}</dd></div>
         <div><dt>추론</dt><dd>${Object.keys(save.deds).length}/${DEDUCTIONS.length}</dd></div>
         <div><dt>보고서 제출</dt><dd>${save.reports}회</dd></div>
-        <div><dt>헛짚음</dt><dd>${save.misses || 0}번</dd></div>
+        <div><dt>헛짚음</dt><dd>${misses}번</dd></div>
       </dl>
       <div class="end-actions">
         <button data-a="restart-all" class="primary">처음부터 다시</button>
@@ -2528,6 +2604,32 @@ function showEnding() {
       </div>
     </div>`;
   el.hidden = false;
+  setTimeout(showBeat, 900);
+}
+
+function showBeat() {
+  const beat = endBeats[endIdx];
+  const box = $('#end-beat');
+  if (!beat || !box) return;
+  box.className = 'end-beat' + (beat.bonus ? ' bonus' : '');
+  box.innerHTML = `<span class="tag">${beat.tag}</span><p class="line">${beat.line}</p>${beat.sub ? `<p class="sub">${beat.sub}</p>` : ''}`;
+  void box.offsetWidth;
+  box.classList.add('in');
+  $('#end-count').textContent = `${endIdx + 1} / ${endBeats.length}`;
+}
+
+function nextBeat() {
+  if ($('#end-story').hidden) return;
+  endIdx += 1;
+  if (endIdx >= endBeats.length) { showEndSummary(); return; }
+  Sound.sfx('page');
+  showBeat();
+}
+
+function showEndSummary() {
+  $('#end-story').hidden = true;
+  $('#end-summary').hidden = false;
+  Sound.sfx('stamp');
 }
 
 
@@ -2704,6 +2806,7 @@ document.addEventListener('click', e => {
     case 'intro-go': save.intro = true; persist(); showBootLog(); break;
     case 'boot-start': startLoop(); break;
     case 'restart-all': resetAll(); break;
+    case 'end-skip': showEndSummary(); break;
     case 'end-close':
       $('#ending').hidden = true;
       running = vm.t < LOOP_LEN;
@@ -2852,6 +2955,7 @@ document.addEventListener('keydown', e => {
     closeStart();
   }
   if (!$('#lock').hidden && !e.target.closest('input, textarea')) { signIn(); return; }
+  if (!$('#ending').hidden && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); nextBeat(); return; }
   const bootEl = $('#boot');
   if (!bootEl.hidden && (e.key === 'Enter' || e.key === ' ') && !e.target.closest('input, textarea')) {
     if (bootEl.classList.contains('intro-mode')) { save.intro = true; persist(); showBootLog(); e.preventDefault(); }
@@ -2875,6 +2979,11 @@ function renderSoundBtn() {
   b.setAttribute('aria-pressed', String(save.sound));
   b.title = save.sound ? '소리 끄기' : '소리 켜기';
 }
+
+// 엔딩: 클릭하면 다음 장면
+$('#ending').addEventListener('click', e => {
+  if (!e.target.closest('button')) nextBeat();
+});
 
 // 잠금 화면: 클릭하면 로그인
 $('#lock').addEventListener('click', signIn);
